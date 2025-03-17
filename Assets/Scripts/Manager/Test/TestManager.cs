@@ -28,5 +28,6 @@ public class TestManager : MonoBehaviour
     {
         bHexGrid = !bHexGrid;
         BoardManager.Instance.ShowHexGrid(bHexGrid);
+        BenchManager.Instance.ShowBenchGrid(bHexGrid);
     }
 }
