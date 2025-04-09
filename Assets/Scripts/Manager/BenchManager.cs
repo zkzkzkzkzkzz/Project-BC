@@ -12,9 +12,9 @@ public class BenchManager : MonoBehaviour
     [SerializeField] private float tileSize = 2f;
     [SerializeField] private Vector3 benchStartPos;
 
-    private List<GameObject> benchList = new List<GameObject>();
-    private List<GameObject> unitsOnBench = new List<GameObject>();
+    private List<Tile> benchTiles = new List<Tile>();
     private int unitCount = 0;  // 디버그용
+
     private void Awake()
     {
         if (Instance == null)
@@ -36,22 +36,33 @@ public class BenchManager : MonoBehaviour
         for (int i = 0; i < benchSize; ++i)
         {
             Vector3 tilePos = benchStartPos + new Vector3(i * tileSize, 0, 0);
-            GameObject bench = Instantiate(benchPrefab, tilePos, Quaternion.identity, transform);
-            bench.name = $"BenchTile_{i}";
-            benchList.Add(bench);
-            bench.SetActive(false);
-            unitsOnBench.Add(null);
+            GameObject tileObj = Instantiate(benchPrefab, tilePos, Quaternion.identity, transform);
+            tileObj.name = $"BenchTile_{i}";
+
+            Tile tile = tileObj.GetComponent<Tile>();
+            if (tile == null)
+                tile = tileObj.AddComponent<Tile>();
+
+            tile.SetTileType(TileType.Bench);
+            tile.BenchIndex = i;
+
+            tileObj.SetActive(false);
+            benchTiles.Add(tile);
         }
     }
 
     public bool PlaceUnitOnBench()
     {
-        for (int i = 0; i < benchSize; ++i)
+        foreach (Tile tile in benchTiles)
         {
-            if (unitsOnBench[i] == null)
+            if (!tile.IsOccupied())
             {
-                Vector3 unitPos = benchList[i].transform.position + Vector3.up;
-                GameObject unit = Instantiate(unitPrefab, unitPos, Quaternion.identity);
+                Vector3 unitPos = tile.transform.position + Vector3.up;
+                GameObject unitObj = Instantiate(unitPrefab, unitPos, Quaternion.identity);
+                Unit unit = unitObj.GetComponent<Unit>();
+
+                unit.SetCurUnitTile(tile);
+                tile.SetOccupyingUnit(unit);
 
                 var renderer = unit.GetComponentInChildren<Renderer>();
                 if (renderer != null)
@@ -61,17 +72,9 @@ public class BenchManager : MonoBehaviour
                     renderer.material.color = color;
                 }
 
-                unitsOnBench[i] = unit;
-
-                var dragUnit = unit.GetComponent<DraggableUnit>();
-                dragUnit.SetCurUnitTile(benchList[i]);
                 ++unitCount;
-                return true;
 
-                //Vector3 unitPos = benchList[i].transform.position + Vector3.up;
-                //GameObject unit = Instantiate(unitPrefab, unitPos, Quaternion.identity);
-                //unitsOnBench[i] = unit;
-                //return true;
+                return true;
             }
         }
 
@@ -81,39 +84,19 @@ public class BenchManager : MonoBehaviour
 
     public void ShowBenchGrid(bool show)
     {
-        foreach (var tile in benchList)
+        foreach (var tile in benchTiles)
         {
-            tile.SetActive(show);
+            tile.gameObject.SetActive(show);
         }
     }
 
-    public int GetBenchTileIndex(GameObject tile)
+    public bool IsBenchTile(Tile tile)
     {
-        return benchList.IndexOf(tile);
+        return tile.GetTileType() == TileType.Bench;
     }
 
-    public GameObject GetBenchTileAt(int idx)
+    public List<Tile> GetBenchTiles()
     {
-        if (idx >= 0 && idx < benchList.Count)
-            return benchList[idx];
-        return null;
-    }
-
-    public GameObject GetBenchUnitAt(int idx)
-    {
-        if (idx >= 0 && idx < unitsOnBench.Count)
-            return unitsOnBench[idx];
-        return null;
-    }
-
-    public void SetBenchUnitAt(int idx, GameObject unit)
-    {
-        if (idx >= 0 && idx < unitsOnBench.Count)
-            unitsOnBench[idx] = unit;
-    }
-
-    public int GetBenchUnitIndex(GameObject unit)
-    {
-        return unitsOnBench.IndexOf(unit);
+        return benchTiles;
     }
 }
