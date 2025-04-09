@@ -6,7 +6,7 @@ public enum TileType { Board, Bench }
 
 public class Tile : MonoBehaviour
 {
-    [SerializeField] private TileType tileType;                 // 타일 타입
+    [SerializeField] private TileType tileType;           // 타일 타입
     [SerializeField] private Unit occupyingUnit = null;   // 타일 점유중인 유닛
 
     [SerializeField] private Vector3 coord;     // 보드용 좌표
@@ -58,5 +58,16 @@ public class Tile : MonoBehaviour
         {
             index = value;
         }
+    }
+
+
+    public bool IsOccupied()
+    {
+        return occupyingUnit != null;
+    }
+
+    public void ClearOccupyingUnit()
+    {
+        occupyingUnit = null;
     }
 }
