@@ -6,12 +6,12 @@ public enum UnitLocationType { Bench, Board }
 
 public class DraggableUnit : MonoBehaviour
 {
-    [SerializeField] private float dragHeight = 0.5f;
-
-    private Vector3 offset;
-    private float originYPos;
-    private bool isDragging = false;
     private Camera mainCam;
+    private bool isDragging = false;
+    private Plane dragPlane;
+    private float originY;
+
+    [SerializeField] float offsetY = 0.5f;
 
     private void Awake()
     {
@@ -20,35 +20,29 @@ public class DraggableUnit : MonoBehaviour
 
     private void OnMouseDown()
     {
-        Plane plane = new Plane(Vector3.up, Vector3.zero);
-        Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
-        if (plane.Raycast(ray, out float enter))
-        {
-            Vector3 hitPoint = ray.GetPoint(enter);
-            offset = transform.position - hitPoint;
-            originYPos = transform.position.y;
-            isDragging = true;
-        }
+        originY = transform.position.y;
+
+        dragPlane = new Plane(Vector3.up, Vector3.zero);
+        isDragging = true;
     }
 
     private void OnMouseDrag()
     {
         if (!isDragging) return;
 
-        Plane plane = new Plane(Vector3.up, Vector3.zero);
         Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
-        if (plane.Raycast(ray, out float enter))
+        if (dragPlane.Raycast(ray, out float enter))
         {
             Vector3 hitPoint = ray.GetPoint(enter);
-            transform.position = new Vector3(hitPoint.x + offset.x, originYPos + dragHeight, hitPoint.z + offset.z);
+            transform.position = new Vector3(hitPoint.x, hitPoint.y + offsetY, hitPoint.z);
         }
     }
 
     private void OnMouseUp()
     {
         isDragging = false;
-        
-        Vector3 curPos = transform.position;
-        transform.position = new Vector3(curPos.x, originYPos, curPos.z);
+
+        Vector3 pos = transform.position;
+        transform.position = new Vector3(pos.x, originY, pos.z);
     }
 }

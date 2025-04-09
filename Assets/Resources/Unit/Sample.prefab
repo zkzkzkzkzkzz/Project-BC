@@ -120,4 +120,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56024220d4dd0224ba1df75a9cf50261, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dragHeight: 0.5
+  offsetY: 1
