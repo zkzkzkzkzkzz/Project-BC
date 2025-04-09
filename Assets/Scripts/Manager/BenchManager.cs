@@ -6,12 +6,14 @@ public class BenchManager : MonoBehaviour
 {
     public static BenchManager Instance { get; private set; }
 
+    [SerializeField] private GameObject unitPrefab;
     [SerializeField] private GameObject benchPrefab;
     [SerializeField] private int benchSize = 8;
     [SerializeField] private float tileSize = 2f;
     [SerializeField] private Vector3 benchStartPos;
 
     private List<GameObject> benchList = new List<GameObject>();
+    private List<GameObject> unitsOnBench = new List<GameObject>();
 
     private void Awake()
     {
@@ -38,7 +40,25 @@ public class BenchManager : MonoBehaviour
             bench.name = $"BenchTile_{i}";
             benchList.Add(bench);
             bench.SetActive(false);
+            unitsOnBench.Add(null);
         }
+    }
+
+    public bool PlaceUnitOnBench()
+    {
+        for (int i = 0; i < benchSize; ++i)
+        {
+            if (unitsOnBench[i] == null)
+            {
+                Vector3 unitPos = benchList[i].transform.position + Vector3.up;
+                GameObject unit = Instantiate(unitPrefab, unitPos, Quaternion.identity);
+                unitsOnBench[i] = unit;
+                return true;
+            }
+        }
+
+        Debug.Log("´ë±â¿­ÀÌ °¡µæ Ã¡½À´Ï´Ù.");
+        return false;
     }
 
     public void ShowBenchGrid(bool show)
