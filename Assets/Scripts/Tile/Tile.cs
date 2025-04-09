@@ -70,4 +70,13 @@ public class Tile : MonoBehaviour
     {
         occupyingUnit = null;
     }
+
+    private void Update()
+    {
+        var renderer = GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            renderer.material.color = occupyingUnit != null ? Color.yellow : Color.white;
+        }
+    }
 }
