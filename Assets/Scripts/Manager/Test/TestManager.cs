@@ -20,14 +20,21 @@ public class TestManager : MonoBehaviour
         }
     }
 
-    // 그리드 활성화 / 비활성화
+    /// <summary>
+    /// 그리드 활성화 / 비활성화
+    /// </summary>
     [SerializeField] private Button GridBtn;
-    private bool bHexGrid = false;
-
-    public void ToggleHexGrid()
+    private bool bGrid = false;
+    public void ToggleGrid()
     {
-        bHexGrid = !bHexGrid;
-        BoardManager.Instance.ShowHexGrid(bHexGrid);
-        BenchManager.Instance.ShowBenchGrid(bHexGrid);
+        bGrid = !bGrid;
+        BoardManager.Instance.ShowHexGrid(bGrid);
+        BenchManager.Instance.ShowBenchGrid(bGrid);
+    }
+
+    [SerializeField] private Button PurchaseBtn;
+    public void PurchaseUnit()
+    {
+        BenchManager.Instance.PlaceUnitOnBench();
     }
 }
