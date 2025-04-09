@@ -53,7 +53,16 @@ public class BenchManager : MonoBehaviour
                 Vector3 unitPos = benchList[i].transform.position + Vector3.up;
                 GameObject unit = Instantiate(unitPrefab, unitPos, Quaternion.identity);
                 unitsOnBench[i] = unit;
+
+                var dragUnit = unit.GetComponent<DraggableUnit>();
+                dragUnit.SetCurUnitTile(benchList[i]);
+
                 return true;
+
+                //Vector3 unitPos = benchList[i].transform.position + Vector3.up;
+                //GameObject unit = Instantiate(unitPrefab, unitPos, Quaternion.identity);
+                //unitsOnBench[i] = unit;
+                //return true;
             }
         }
 
@@ -67,5 +76,35 @@ public class BenchManager : MonoBehaviour
         {
             tile.SetActive(show);
         }
+    }
+
+    public int GetBenchTileIndex(GameObject tile)
+    {
+        return benchList.IndexOf(tile);
+    }
+
+    public GameObject GetBenchTileAt(int idx)
+    {
+        if (idx >= 0 && idx < benchList.Count)
+            return benchList[idx];
+        return null;
+    }
+
+    public GameObject GetBenchUnitAt(int idx)
+    {
+        if (idx >= 0 && idx < unitsOnBench.Count)
+            return unitsOnBench[idx];
+        return null;
+    }
+
+    public void SetBenchUnitAt(int idx, GameObject unit)
+    {
+        if (idx >= 0 && idx < unitsOnBench.Count)
+            unitsOnBench[idx] = unit;
+    }
+
+    public int GetBenchUnitIndex(GameObject unit)
+    {
+        return unitsOnBench.IndexOf(unit);
     }
 }

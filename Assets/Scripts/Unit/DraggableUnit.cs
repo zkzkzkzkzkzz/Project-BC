@@ -16,6 +16,8 @@ public class DraggableUnit : MonoBehaviour
 
     private GameObject hoveredTile = null;  // 현재 마우스가 가리키고 있는 타일
 
+    private GameObject curTile; // 유닛이 현재 점유하고 있는 타일
+
     private void Awake()
     {
         mainCam = Camera.main;
@@ -55,10 +57,43 @@ public class DraggableUnit : MonoBehaviour
 
         if (hoveredTile != null)
         {
-            Debug.Log("타일 발견");
-            Vector3 targetPos = hoveredTile.transform.position;
-            transform.position = new Vector3(targetPos.x, originPos.y, targetPos.z);
-            hoveredTile = null;
+            if (BenchManager.Instance.GetBenchTileIndex(hoveredTile) != -1)
+            {
+                int myIdx = BenchManager.Instance.GetBenchTileIndex(curTile);
+                int targetIdx = BenchManager.Instance.GetBenchTileIndex(hoveredTile);
+
+                if (myIdx == -1 || targetIdx == -1)
+                    return;
+
+                GameObject otherUnit = BenchManager.Instance.GetBenchUnitAt(targetIdx);
+
+                if (otherUnit != null && otherUnit != this.gameObject)
+                {
+                    otherUnit.transform.position = curTile.transform.position;
+                    transform.position = hoveredTile.transform.position;
+
+                    DraggableUnit other = otherUnit.GetComponent<DraggableUnit>();
+                    other.curTile = curTile;
+                    curTile = hoveredTile;
+
+                    BenchManager.Instance.SetBenchUnitAt(myIdx, otherUnit);
+                    BenchManager.Instance.SetBenchUnitAt(targetIdx, this.gameObject);
+                }
+                else
+                {
+                    transform.position = hoveredTile.transform.position;
+                    BenchManager.Instance.SetBenchUnitAt(myIdx, null);
+                    BenchManager.Instance.SetBenchUnitAt(targetIdx, this.gameObject);
+                    curTile = hoveredTile;
+                }
+
+            }
+            else
+                transform.position = originPos;
+            //Debug.Log("타일 발견");
+            //Vector3 targetPos = hoveredTile.transform.position;
+            //transform.position = new Vector3(targetPos.x, originPos.y, targetPos.z);
+            //hoveredTile = null;
         }
         else
         {
@@ -66,5 +101,16 @@ public class DraggableUnit : MonoBehaviour
             transform.position = originPos;
             hoveredTile = null;
         }
+    }
+
+
+    public GameObject GetCurUnitTile()
+    {
+        return curTile;
+    }
+
+    public void SetCurUnitTile(GameObject tile)
+    {
+        curTile = tile;
     }
 }
