@@ -14,7 +14,7 @@ public class BenchManager : MonoBehaviour
 
     private List<GameObject> benchList = new List<GameObject>();
     private List<GameObject> unitsOnBench = new List<GameObject>();
-
+    private int unitCount = 0;  // 디버그용
     private void Awake()
     {
         if (Instance == null)
@@ -52,11 +52,20 @@ public class BenchManager : MonoBehaviour
             {
                 Vector3 unitPos = benchList[i].transform.position + Vector3.up;
                 GameObject unit = Instantiate(unitPrefab, unitPos, Quaternion.identity);
+
+                var renderer = unit.GetComponentInChildren<Renderer>();
+                if (renderer != null)
+                {
+                    renderer.material = new Material(renderer.material);
+                    Color color = Color.HSVToRGB((unitCount * 0.1f) % 1f, 0.8f, 1f);
+                    renderer.material.color = color;
+                }
+
                 unitsOnBench[i] = unit;
 
                 var dragUnit = unit.GetComponent<DraggableUnit>();
                 dragUnit.SetCurUnitTile(benchList[i]);
-
+                ++unitCount;
                 return true;
 
                 //Vector3 unitPos = benchList[i].transform.position + Vector3.up;
