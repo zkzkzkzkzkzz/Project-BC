@@ -56,44 +56,30 @@ public class Unit : MonoBehaviour
         
         if (hoveredTile != null)
         {
-            if (hoveredTile.GetTileType() == TileType.Bench)
+            Tile myTile = curTile;
+            Tile targetTile = hoveredTile;
+
+            if (myTile == null || targetTile == null) return;
+
+            Unit otherUnit = targetTile.GetOccupyingUnit();
+
+            if (otherUnit != null && otherUnit != this)
             {
-                Debug.Log("대기열 타일 클릭");
+                otherUnit.transform.position = myTile.transform.position + Vector3.up * unitYOffset;
+                transform.position = targetTile.transform.position + Vector3.up * unitYOffset;
 
-                Tile myTile = curTile;
-                Tile targetTile = hoveredTile;
+                otherUnit.SetCurUnitTile(myTile);
+                SetCurUnitTile(targetTile);
 
-                if (myTile == null || targetTile == null) return;
-
-                Unit otherUnit = targetTile.GetOccupyingUnit();
-
-                if (otherUnit != null && otherUnit != this)
-                {
-                    otherUnit.transform.position = myTile.transform.position + Vector3.up * unitYOffset;
-                    transform.position = targetTile.transform.position + Vector3.up * unitYOffset;
-
-                    otherUnit.SetCurUnitTile(myTile);
-                    SetCurUnitTile(targetTile);
-
-                    myTile.SetOccupyingUnit(otherUnit);
-                    targetTile.SetOccupyingUnit(this);
-                }
-                else
-                {
-                    transform.position = targetTile.transform.position + Vector3.up * unitYOffset;
-                    myTile.SetOccupyingUnit(null);
-                    targetTile.SetOccupyingUnit(this);
-                    SetCurUnitTile(targetTile);
-                }
-            }
-            else if (hoveredTile.GetTileType() == TileType.Board)
-            {
-                Debug.Log("보드 타일 클릭");
-                // 추후 Board 관련 처리
+                myTile.SetOccupyingUnit(otherUnit);
+                targetTile.SetOccupyingUnit(this);
             }
             else
             {
-                transform.position = originPos;
+                transform.position = targetTile.transform.position + Vector3.up * unitYOffset;
+                myTile.SetOccupyingUnit(null);
+                targetTile.SetOccupyingUnit(this);
+                SetCurUnitTile(targetTile);
             }
         }
         else
