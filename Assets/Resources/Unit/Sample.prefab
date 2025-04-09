@@ -121,3 +121,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   offsetY: 1
+  tileLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
