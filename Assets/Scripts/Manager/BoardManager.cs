@@ -6,16 +6,15 @@ public class BoardManager : MonoBehaviour
 {
     public static BoardManager Instance { get; private set; }
 
-    [SerializeField] private GameObject TilePrefab;
+    [SerializeField] private GameObject tilePrefab;
     [SerializeField] private float radius;  // 타일 크기
 
     // 보드 크기
-    [SerializeField] private int Rows = 7;
-    [SerializeField] private int Cols = 8;
-
+    [SerializeField] private int rows = 7;
+    [SerializeField] private int cols = 8;
     [SerializeField] private float gap = 1.1f;
 
-    private Dictionary<Vector3, GameObject> hexGrid = new Dictionary<Vector3, GameObject>();
+    private List<Tile> boardTiles = new List<Tile>();
 
     private void Awake()
     {
@@ -33,35 +32,39 @@ public class BoardManager : MonoBehaviour
         GenerateGrid();
     }
 
-    void GenerateGrid()
+    private void GenerateGrid()
     {
-        for (int row = 0; row < Rows; row++)
+        for (int row = 0; row < rows; row++)
         {
-            for (int col = 0; col < Cols; col++)
+            for (int col = 0; col < cols; col++)
             {
-                // odd-r 변환: Axial 좌표로 변경
-                // 홀수번째 타일 밀기
+                // odd-r offset → axial → cube 좌표 변환
                 int q = col - (row - (row & 1)) / 2;
                 int rCoord = row;
 
-                // Axial -> Cube 변환
                 int x = q;
                 int z = rCoord;
                 int y = -x - z;
 
-                // Cube -> 월드 좌표 (Pointy-topped)
                 Vector3 pos = CubeToWorldPointy(x, y, z, radius, gap);
 
-                // 헥스 타일 생성
-                GameObject tile = Instantiate(TilePrefab, pos, Quaternion.identity, transform);
-                tile.name = $"Tile_{row}_{col} (x:{x}, y:{y}, z:{z})";
-                hexGrid[pos] = tile;
-                tile.SetActive(false);
+                GameObject tileObj = Instantiate(tilePrefab, pos, Quaternion.identity, transform);
+                tileObj.name = $"Tile_{row}_{col} (x:{x}, y:{y}, z:{z})";
+
+                Tile tile = tileObj.GetComponent<Tile>();
+                if (tile == null)
+                    tile = tileObj.AddComponent<Tile>();
+
+                tile.SetTileType(TileType.Board);
+                tile.BoardCoord = new Vector3(x, y, z);
+
+                tileObj.SetActive(false);
+                boardTiles.Add(tile);
             }
         }
     }
 
-    Vector3 CubeToWorldPointy(int x, int y, int z, float r, float gapFactor)
+    private Vector3 CubeToWorldPointy(int x, int y, int z, float r, float gapFactor)
     {
         float effectiveR = r * gapFactor;
         float worldX = Mathf.Sqrt(3f) * (x + (z * 0.5f)) * effectiveR;
@@ -71,9 +74,19 @@ public class BoardManager : MonoBehaviour
 
     public void ShowHexGrid(bool show)
     {
-        foreach (var tile in hexGrid.Values)
+        foreach (var tile in boardTiles)
         {
-            tile.SetActive(show);
+            tile.gameObject.SetActive(show);
         }
+    }
+
+    public bool IsBoardTile(Tile tile)
+    {
+        return tile.GetTileType() == TileType.Board;
+    }
+
+    public List<Tile> GetBoardTiles()
+    {
+        return boardTiles;
     }
 }
