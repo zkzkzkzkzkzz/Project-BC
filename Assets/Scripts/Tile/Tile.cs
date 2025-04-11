@@ -73,10 +73,21 @@ public class Tile : MonoBehaviour
 
     private void Update()
     {
+        DebugColor();
+    }
+
+    /// <summary>
+    /// @@@디버그용.
+    /// 유닛 타일 점유 상태 표기
+    /// </summary>
+    private void DebugColor()
+    {
         var renderer = GetComponent<Renderer>();
-        if (renderer != null)
-        {
-            renderer.material.color = occupyingUnit != null ? Color.yellow : Color.white;
-        }
+        if (renderer == null) return;
+
+        if (occupyingUnit == null)
+            renderer.material.color = Color.white;
+        else
+            renderer.material.color = tileType == TileType.Bench ? Color.yellow : Color.cyan;
     }
 }

@@ -64,6 +64,7 @@ public class BenchManager : MonoBehaviour
                 unit.SetCurUnitTile(tile);
                 tile.SetOccupyingUnit(unit);
 
+                // @@디버그용
                 var renderer = unit.GetComponentInChildren<Renderer>();
                 if (renderer != null)
                 {
@@ -71,8 +72,8 @@ public class BenchManager : MonoBehaviour
                     Color color = Color.HSVToRGB((unitCount * 0.1f) % 1f, 0.8f, 1f);
                     renderer.material.color = color;
                 }
-
                 ++unitCount;
+                // ==========
 
                 return true;
             }
