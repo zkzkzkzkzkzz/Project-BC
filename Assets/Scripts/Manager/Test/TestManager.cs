@@ -67,4 +67,21 @@ public class TestManager : MonoBehaviour
     {
         BattleManager.Instance.SpawnDummyEnemy(enemyCount);
     }
+
+
+
+    public void ClearEnemy()
+    {
+        var tiles = BoardManager.Instance.GetBoardTiles();
+
+        foreach (Tile tile in tiles)
+        {
+            if (tile.IsOccupied() && tile.BoardCoord.z > 3f)
+            {
+                Unit unit = tile.GetOccupyingUnit();
+                Destroy(unit.gameObject);
+                tile.SetOccupyingUnit(null);
+            }
+        }
+    }
 }
