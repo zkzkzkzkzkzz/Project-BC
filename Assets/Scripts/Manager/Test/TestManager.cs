@@ -41,12 +41,19 @@ public class TestManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 전투 시작
+    /// 게임 상태 전환
     /// </summary>
-    public void BattleStart()
+    public void GameStateToggle()
     {
-        GameManager.Instance.SetGameState(GameState.Battle);
-        BattleManager.Instance.BattleStart();
-        Debug.Log("전투 시작");
+        GameState state = GameManager.Instance.CurState;
+
+        if (state == GameState.Prepare)
+        {
+            GameManager.Instance.SetGameState(GameState.Battle);
+            BattleManager.Instance.BattleStart();
+            Debug.Log("전투 시작");
+        }
+        else
+            GameManager.Instance.SetGameState(GameState.Prepare);
     }
 }
