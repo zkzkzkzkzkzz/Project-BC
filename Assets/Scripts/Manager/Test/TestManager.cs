@@ -23,7 +23,6 @@ public class TestManager : MonoBehaviour
     /// <summary>
     /// 그리드 활성화 / 비활성화
     /// </summary>
-    [SerializeField] private Button GridBtn;
     private bool bGrid = false;
     public void ToggleGrid()
     {
@@ -32,9 +31,22 @@ public class TestManager : MonoBehaviour
         BenchManager.Instance.ShowBenchGrid(bGrid);
     }
 
-    [SerializeField] private Button PurchaseBtn;
+    /// <summary>
+    /// 유닛 구매
+    /// 구매된 유닛은 벤치에 배치
+    /// </summary>
     public void PurchaseUnit()
     {
         BenchManager.Instance.PlaceUnitOnBench();
+    }
+
+    /// <summary>
+    /// 전투 시작
+    /// </summary>
+    public void BattleStart()
+    {
+        GameManager.Instance.SetGameState(GameState.Battle);
+        BattleManager.Instance.BattleStart();
+        Debug.Log("전투 시작");
     }
 }
