@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
+    private int ownerId;            // 유닛 오너 고유 id
+    public int OwnerId => ownerId;  // 외부 읽기 전용 프로퍼티 제공
+
     private Camera mainCam;
     private bool isDragging = false;
     private Plane dragPlane;
@@ -21,6 +24,11 @@ public class Unit : MonoBehaviour
     private void Awake()
     {
         mainCam = Camera.main;
+    }
+
+    public void SetOwnerId(int id)
+    {
+        ownerId = id;
     }
 
     private void OnMouseDown()

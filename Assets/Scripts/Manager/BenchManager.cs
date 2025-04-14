@@ -21,7 +21,7 @@ public class BenchManager : MonoBehaviour
             Instance = this;
         else
         {
-            Destroy(Instance);
+            Destroy(gameObject);
             return;
         }
     }
