@@ -33,6 +33,8 @@ public class Unit : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (!IsDragEnable()) return;
+
         originPos = transform.position;
         dragPlane = new Plane(Vector3.up, Vector3.zero);
         isDragging = true;
@@ -67,7 +69,14 @@ public class Unit : MonoBehaviour
             Tile myTile = curTile;
             Tile targetTile = hoveredTile;
 
-            if (myTile == null || targetTile == null) return;
+            if (myTile == null || targetTile == null ||
+                myTile.GetTileType() == TileType.Board && GameManager.Instance.IsInBattle()) return;
+
+            if (targetTile.GetTileType() == TileType.Board && GameManager.Instance.IsInBattle())
+            {
+                transform.position = originPos;
+                return;
+            }
 
             Unit otherUnit = targetTile.GetOccupyingUnit();
 
@@ -99,5 +108,10 @@ public class Unit : MonoBehaviour
     public void SetCurUnitTile(Tile tile)
     {
         curTile = tile;
+    }
+
+    public bool IsDragEnable()
+    {
+        return GameManager.Instance.IsInPrepare() || curTileType == TileType.Bench;
     }
 }
