@@ -10,8 +10,8 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private float radius;  // 타일 크기
 
     // 보드 크기
-    [SerializeField] private int rows = 7;
-    [SerializeField] private int cols = 8;
+    [SerializeField] private int rows = 8;
+    [SerializeField] private int cols = 7;
     [SerializeField] private float gap = 1.1f;
 
     private List<Tile> boardTiles = new List<Tile>();
@@ -88,5 +88,21 @@ public class BoardManager : MonoBehaviour
     public List<Tile> GetBoardTiles()
     {
         return boardTiles;
+    }
+
+    public Tile GetTileAt(Vector3 cubeCoord)
+    {
+        foreach (var tile in boardTiles)
+        {
+            Vector3 tileCoord = tile.BoardCoord;
+            if ((int)tileCoord.x == cubeCoord.x &&
+                (int)tileCoord.y == cubeCoord.y &&
+                (int)tileCoord.z == cubeCoord.z)
+            {
+                return tile;
+            }
+        }
+
+        return null;
     }
 }
