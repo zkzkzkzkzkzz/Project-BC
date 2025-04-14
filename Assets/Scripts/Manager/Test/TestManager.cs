@@ -56,4 +56,15 @@ public class TestManager : MonoBehaviour
         else
             GameManager.Instance.SetGameState(GameState.Prepare);
     }
+
+
+    [SerializeField] private int enemyCount = 1;
+    /// <summary>
+    /// 디버그용 더미 적 생성
+    /// enemyCount : 생성할 적 수
+    /// </summary>
+    public void SpawnDummyEnemies()
+    {
+        BattleManager.Instance.SpawnDummyEnemy(enemyCount);
+    }
 }
