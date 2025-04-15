@@ -56,7 +56,7 @@ public class BoardManager : MonoBehaviour
                     tile = tileObj.AddComponent<Tile>();
 
                 tile.SetTileType(TileType.Board);
-                tile.BoardCoord = new Vector3(x, y, z);
+                tile.BoardCoord = new Vector3Int(x, y, z);
 
                 tileObj.SetActive(false);
                 boardTiles.Add(tile);
@@ -90,18 +90,11 @@ public class BoardManager : MonoBehaviour
         return boardTiles;
     }
 
-    public Tile GetTileAt(Vector3 cubeCoord)
+    public Tile GetTileAt(Vector3Int cubeCoord)
     {
         foreach (var tile in boardTiles)
-        {
-            Vector3 tileCoord = tile.BoardCoord;
-            if ((int)tileCoord.x == cubeCoord.x &&
-                (int)tileCoord.y == cubeCoord.y &&
-                (int)tileCoord.z == cubeCoord.z)
-            {
+            if (tile.BoardCoord == cubeCoord)
                 return tile;
-            }
-        }
 
         return null;
     }
