@@ -21,17 +21,35 @@ public class BattleManager : MonoBehaviour
 
     public void BattleStart()
     {
-        var units = FindObjectsOfType<Unit>();
+        List<Unit> sortedUnits = SortedMyUnits(0);
+        foreach (Unit unit in sortedUnits)
+            unit.BattleStartAI();
 
-        foreach (var unit in units)
-        {
-            if (unit.OwnerId == 0 && unit.curTileType == TileType.Board)
-            {
-                InfiniteLoopDetector.Run();
-                unit.BattleStartAI();
-            }
-        }
+        List<Unit> sortedEnemies = SortedMyUnits(1);
+        foreach (Unit unit in sortedEnemies)
+            unit.BattleStartAI();
     }
+
+    public List<Unit> SortedMyUnits(int ownerId)
+    {
+        List<Unit> allies = new List<Unit>();
+        List<Unit> enemies = new List<Unit>();
+
+        foreach (var unit in FindObjectsOfType<Unit>())
+        {
+            if (unit.curTile == null || unit.curTileType == TileType.Bench) continue;
+
+            if (unit.OwnerId == ownerId)
+                allies.Add(unit);
+            else
+                enemies.Add(unit);
+        }
+
+        allies.Sort(new UnitComparer(enemies));
+
+        return allies;
+    }
+
 
     // @@@@ 디버그용 더미 적 생성
     [SerializeField] private GameObject enemyPrefab;
