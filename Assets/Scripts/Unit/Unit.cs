@@ -124,13 +124,13 @@ public class Unit : MonoBehaviour
     private Unit FindClosestEnemy()
     {
         var Units = FindObjectsOfType<Unit>();
-        int minDist = int.MaxValue;
+        float minDist = float.MaxValue;
         Unit closestEnemy = null;
         foreach (var unit in Units)
         {
-            if (unit.ownerId == ownerId) continue;
+            if (unit.ownerId == ownerId || unit.curTile == null) continue;
 
-            int dist = PathFindingSystem.Heuristic(curTile, unit.curTile);
+            float dist = PathFindingSystem.Heuristic(curTile, unit.curTile);
             if (dist < minDist)
             {
                 minDist = dist;
@@ -141,71 +141,64 @@ public class Unit : MonoBehaviour
         return closestEnemy;
     }
 
-    /// <summary>
-    /// target의 인접 타일 중 가장 짧은 경로를 가지는 타일 반환
-    /// </summary>
-    private Tile FindBestTileToMove(Unit target)
+    // 그리디 방식
+    private Unit moveTargetUnit = null;       // 타겟 유닛
+
+    public void BattleStartAI()
     {
-        List<Tile> neighbors = PathFindingSystem.GetNeighbors(target.curTile);
+        if (moveRoutine != null)
+            StopCoroutine(moveRoutine);
 
-        Tile bestTile = null;
-        int minDist = int.MaxValue;
-
-        foreach (Tile neighbor in neighbors)
-        {
-            if (neighbor.IsOccupied() || neighbor.IsReserved()) continue;
-
-            var path = PathFindingSystem.FindPath(curTile, neighbor);
-            if (path != null && path.Count < minDist)
-            {
-                bestTile = neighbor;
-                minDist = path.Count;
-            }
-        }
-
-        return bestTile;
+        moveRoutine = StartCoroutine(GreedyMoveRoutine());
     }
 
-    private IEnumerator MoveRoutine()
+    private IEnumerator GreedyMoveRoutine()
     {
-        if (curTile == null)
-            yield break;
-
-        Unit target = FindClosestEnemy();
-        if (target == null)
-            yield break;
-
-        Tile dest = FindBestTileToMove(target);
-        if (dest == null || dest == curTile)
-            yield break;
-
-        dest.Reserve(this);
-
-        List<Tile> path = PathFindingSystem.FindPath(curTile, dest);
-        if (path == null || path.Count < 2)
-            yield break;
-
-        for (int i = 1; i < path.Count; ++i)
+        while (GameManager.Instance.IsInBattle())
         {
-            Tile nextTile = path[i];
+            moveTargetUnit = FindClosestEnemy();
+            if (moveTargetUnit == null || moveTargetUnit.curTile == null)
+                break;
+
+            if (IsAdjacentTo(moveTargetUnit)) break;
+
+            Tile targetTile = moveTargetUnit.curTile;
+
+            List<Tile> path = PathFindingSystem.FindPath(curTile, targetTile);
+            if (path == null || path.Count < 2)
+            {
+                yield return new WaitForSeconds(0.5f);
+                continue;
+            }
+
+            Tile nextTile = path[1];
+
+            if (!nextTile.IsAvailable())
+            {
+                yield return new WaitForSeconds(0.5f);
+                continue;
+            }
+
+            curTile.ClearReservation();
+            curTile.ClearOccupyingUnit();
+
+            nextTile.Reserve(this);
+            nextTile.SetOccupyingUnit(this);
+            SetCurUnitTile(nextTile);
 
             transform.position = nextTile.transform.position + Vector3.up * unitYOffset;
-
-            curTile.SetOccupyingUnit(null);
-            nextTile.SetOccupyingUnit(this);
-            nextTile.ClearReservation();
-            curTile = nextTile;
 
             yield return new WaitForSeconds(1f);
         }
 
         moveRoutine = null;
+        curTile?.ClearReservation();
     }
 
-    public void BattleStartAI()
+    private bool IsAdjacentTo(Unit target)
     {
-        if (moveRoutine == null)
-            moveRoutine = StartCoroutine(MoveRoutine());
+        var neighbors = PathFindingSystem.GetNeighbors(curTile);
+        return neighbors.Contains(target.curTile);
     }
 
     public void BattleEndAI()
