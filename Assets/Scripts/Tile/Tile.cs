@@ -8,9 +8,22 @@ public class Tile : MonoBehaviour
 {
     [SerializeField] private TileType tileType;           // 타일 타입
     [SerializeField] private Unit occupyingUnit = null;   // 타일 점유중인 유닛
+    [SerializeField] private Unit reservedBy = null;      // 타일을 점유 예정인 유닛
 
     [SerializeField] private Vector3Int coord;     // 보드용 좌표
     [SerializeField] private int index;         // 벤치용 인덱스
+
+
+    // 타일 예약 시스템
+    public bool IsOccupied() => occupyingUnit != null;
+    public void ClearOccupyingUnit() => occupyingUnit = null;
+
+    public bool IsReserved() => reservedBy != null;
+    public bool IsReservedBy(Unit unit) => reservedBy == unit;
+    public void Reserve(Unit unit) => reservedBy = unit;
+    public void ClearReservation() => reservedBy = null;
+
+    public bool IsAvailable() => !IsOccupied() && !IsReserved();
 
 
     public TileType GetTileType()
@@ -61,16 +74,6 @@ public class Tile : MonoBehaviour
     }
 
 
-    public bool IsOccupied()
-    {
-        return occupyingUnit != null;
-    }
-
-    public void ClearOccupyingUnit()
-    {
-        occupyingUnit = null;
-    }
-
     private void Update()
     {
         DebugColor();
@@ -85,8 +88,10 @@ public class Tile : MonoBehaviour
         var renderer = GetComponent<Renderer>();
         if (renderer == null) return;
 
-        if (occupyingUnit == null)
+        if (!IsOccupied() && !IsReserved())
             renderer.material.color = Color.white;
+        else if (!IsOccupied() && IsReserved())
+            renderer.material.color = Color.green;
         else
             renderer.material.color = tileType == TileType.Bench ? Color.yellow : Color.cyan;
     }

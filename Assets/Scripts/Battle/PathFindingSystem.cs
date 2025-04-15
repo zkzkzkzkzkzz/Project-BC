@@ -95,18 +95,7 @@ public static class PathFindingSystem
 
             if (neighbor != null)
                 neighbors.Add(neighbor);
-            else
-                Debug.Log("이웃 타일 없음");
         }
-
-        //foreach (var dir in CubeDirections)
-        //{
-        //    InfiniteLoopDetector.Run();
-        //    Vector3Int neighborCoord = tile.BoardCoord + dir;
-        //    Tile neighbor = BoardManager.Instance.GetTileAt(neighborCoord);
-        //    if (neighbor != null)
-        //        neighbors.Add(neighbor);
-        //}
 
         return neighbors;
     }

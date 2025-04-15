@@ -153,7 +153,7 @@ public class Unit : MonoBehaviour
 
         foreach (Tile neighbor in neighbors)
         {
-            if (neighbor.IsOccupied()) continue;
+            if (neighbor.IsOccupied() || neighbor.IsReserved()) continue;
 
             var path = PathFindingSystem.FindPath(curTile, neighbor);
             if (path != null && path.Count < minDist)
@@ -164,34 +164,6 @@ public class Unit : MonoBehaviour
         }
 
         return bestTile;
-    }
-
-    /// <summary>
-    /// 전투 시작 후 타겟 인접 타일 중 가장 가까운 타일로 이동
-    /// </summary>
-    public void MoveToTarget()
-    {
-        Unit target = FindClosestEnemy();
-        if (target == null) return;
-
-        Tile dest = FindBestTileToMove(target);
-        if (dest == null || dest == curTile)
-            return;
-
-        var path = PathFindingSystem.FindPath(curTile, dest);
-        if (path == null || path.Count < 2)
-            return; // 현재 위치하고 있는 타일이 가장 가까운 타일
-
-        for (int i = 1; i < path.Count; i++)
-        {
-            Tile nextTile = path[i];
-
-            transform.position = nextTile.transform.position + Vector3.up * unitYOffset;
-
-            curTile.SetOccupyingUnit(null);
-            nextTile.SetOccupyingUnit(this);
-            curTile = nextTile;
-        }
     }
 
     private IEnumerator MoveRoutine()
@@ -207,20 +179,21 @@ public class Unit : MonoBehaviour
         if (dest == null || dest == curTile)
             yield break;
 
+        dest.Reserve(this);
+
         List<Tile> path = PathFindingSystem.FindPath(curTile, dest);
         if (path == null || path.Count < 2)
             yield break;
 
-        for (int i = 1; i < path.Count; i++)
+        for (int i = 1; i < path.Count; ++i)
         {
             Tile nextTile = path[i];
 
-            // 이동
             transform.position = nextTile.transform.position + Vector3.up * unitYOffset;
 
-            // 점유 정보 갱신
             curTile.SetOccupyingUnit(null);
             nextTile.SetOccupyingUnit(this);
+            nextTile.ClearReservation();
             curTile = nextTile;
 
             yield return new WaitForSeconds(1f);
