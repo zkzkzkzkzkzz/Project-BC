@@ -20,7 +20,7 @@ public static class PathFindingSystem
         var gScore = new Dictionary<Tile, int> { [start] = 0 }; // 시작점에서 각 노드까지의 실제 거리
 
         // 예상 최단 거리 (f = g + h)
-        var fScore = new Dictionary<Tile, int> { [start] = Heuristic(start, end) };
+        var fScore = new Dictionary<Tile, float> { [start] = Heuristic(start, end) };
 
         while (openSet.Count > 0)
         {
@@ -32,7 +32,7 @@ public static class PathFindingSystem
 
             foreach (var neighbor in GetNeighbors(curTile))
             {
-                if (neighbor.IsOccupied()) continue;
+                if (neighbor.IsOccupied() && neighbor != end) continue;
 
                 int tentativeG = gScore.ContainsKey(curTile) ? gScore[curTile] + 1 : int.MaxValue;
                 if (!gScore.ContainsKey(neighbor) || tentativeG < gScore[neighbor])
@@ -51,14 +51,14 @@ public static class PathFindingSystem
     }
 
 
-    private static Tile GetLowestFScore(List<Tile> openSet, Dictionary<Tile, int> fScore)
+    private static Tile GetLowestFScore(List<Tile> openSet, Dictionary<Tile, float> fScore)
     {
         Tile lowest = openSet[0];
-        int lowestScore = fScore.ContainsKey(lowest) ? fScore[lowest] : int.MaxValue;
+        float lowestScore = fScore.ContainsKey(lowest) ? fScore[lowest] : float.MaxValue;
 
         foreach (var tile in openSet)
         {
-            int score = fScore.ContainsKey(tile) ? fScore[tile] : int.MaxValue;
+            float score = fScore.ContainsKey(tile) ? fScore[tile] : float.MaxValue;
             if (score < lowestScore)
             {
                 lowest = tile;
@@ -100,11 +100,11 @@ public static class PathFindingSystem
         return neighbors;
     }
 
-    public static int Heuristic(Tile a, Tile b)
+    public static float Heuristic(Tile a, Tile b)
     {
         Vector3Int ac = a.BoardCoord;
         Vector3Int bc = b.BoardCoord;
 
-        return (Mathf.Abs(ac.x - bc.x) + Mathf.Abs(ac.y - bc.y) + Mathf.Abs(ac.z - bc.z)) / 2;
+        return (Mathf.Abs(ac.x - bc.x) + Mathf.Abs(ac.y - bc.y) + Mathf.Abs(ac.z - bc.z)) / 2f;
     }
 }
