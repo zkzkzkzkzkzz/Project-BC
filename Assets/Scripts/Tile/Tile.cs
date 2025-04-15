@@ -9,7 +9,7 @@ public class Tile : MonoBehaviour
     [SerializeField] private TileType tileType;           // 타일 타입
     [SerializeField] private Unit occupyingUnit = null;   // 타일 점유중인 유닛
 
-    [SerializeField] private Vector3 coord;     // 보드용 좌표
+    [SerializeField] private Vector3Int coord;     // 보드용 좌표
     [SerializeField] private int index;         // 벤치용 인덱스
 
 
@@ -32,7 +32,7 @@ public class Tile : MonoBehaviour
     }
 
 
-    public Vector3 BoardCoord
+    public Vector3Int BoardCoord
     {
         get
         {

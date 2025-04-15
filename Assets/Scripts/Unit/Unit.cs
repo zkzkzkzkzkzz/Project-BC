@@ -123,15 +123,14 @@ public class Unit : MonoBehaviour
     /// </summary>
     private Unit FindClosestEnemy()
     {
-        var allUnits = FindObjectsOfType<Unit>();
-        float minDist = float.MaxValue;
+        var Units = FindObjectsOfType<Unit>();
+        int minDist = int.MaxValue;
         Unit closestEnemy = null;
-
-        foreach (var unit in allUnits)
+        foreach (var unit in Units)
         {
-            if (unit.ownerId == this.ownerId) continue;
+            if (unit.ownerId == ownerId) continue;
 
-            float dist = PathFindingSystem.Heuristic(this.curTile, unit.curTile);
+            int dist = PathFindingSystem.Heuristic(curTile, unit.curTile);
             if (dist < minDist)
             {
                 minDist = dist;
@@ -147,16 +146,16 @@ public class Unit : MonoBehaviour
     /// </summary>
     private Tile FindBestTileToMove(Unit target)
     {
-        var neighbors = PathFindingSystem.GetNeighbors(target.curTile);
+        List<Tile> neighbors = PathFindingSystem.GetNeighbors(target.curTile);
 
         Tile bestTile = null;
         int minDist = int.MaxValue;
 
-        foreach (var neighbor in neighbors)
+        foreach (Tile neighbor in neighbors)
         {
             if (neighbor.IsOccupied()) continue;
 
-            var path = PathFindingSystem.FindPath(this.curTile, neighbor);
+            var path = PathFindingSystem.FindPath(curTile, neighbor);
             if (path != null && path.Count < minDist)
             {
                 bestTile = neighbor;
