@@ -24,7 +24,13 @@ public class BattleManager : MonoBehaviour
         var units = FindObjectsOfType<Unit>();
 
         foreach (var unit in units)
-            unit.MoveToTarget();
+        {
+            if (unit.OwnerId == 0 && unit.curTileType == TileType.Board)
+            {
+                InfiniteLoopDetector.Run();
+                unit.BattleStartAI();
+            }
+        }
     }
 
     // @@@@ 디버그용 더미 적 생성
