@@ -5,11 +5,11 @@ using UnityEngine;
 
 public static class PathFindingSystem
 {
-    private static Vector3[] CubeDirections = new Vector3[]
+    private static readonly Vector3Int[] CubeDirections = new Vector3Int[]
     {
-        new Vector3(1, -1, 0), new Vector3(-1, 1, 0),
-        new Vector3(1, 0, -1), new Vector3(-1, 0, 1),
-        new Vector3(0, 1, -1), new Vector3(0, -1, 1)
+        new Vector3Int(1, -1, 0), new Vector3Int(1, 0, -1),
+        new Vector3Int(0, 1, -1), new Vector3Int(-1, 1, 0),
+        new Vector3Int(-1, 0, 1), new Vector3Int(0, -1, 1)
     };
 
     // 계속 이웃 타일을 탐색하면서 최단 경로가 확정되면 해당 경로를 반환
@@ -28,7 +28,7 @@ public static class PathFindingSystem
             if (curTile == end)
                 return ReconstructPath(cameFrom, curTile);
 
-            openSet.Add(curTile);
+            openSet.Remove(curTile);
 
             foreach (var neighbor in GetNeighbors(curTile))
             {
@@ -86,21 +86,35 @@ public static class PathFindingSystem
     public static List<Tile> GetNeighbors(Tile tile)
     {
         var neighbors = new List<Tile>();
-        foreach (var dir in CubeDirections)
+
+        for (int i = 0; i < CubeDirections.Length; ++i)
         {
-            Vector3 neighborCoord = Vector3Int.RoundToInt(tile.BoardCoord) + dir;
+            InfiniteLoopDetector.Run();
+            Vector3Int neighborCoord = tile.BoardCoord + CubeDirections[i];
             Tile neighbor = BoardManager.Instance.GetTileAt(neighborCoord);
+
             if (neighbor != null)
                 neighbors.Add(neighbor);
+            else
+                Debug.Log("이웃 타일 없음");
         }
+
+        //foreach (var dir in CubeDirections)
+        //{
+        //    InfiniteLoopDetector.Run();
+        //    Vector3Int neighborCoord = tile.BoardCoord + dir;
+        //    Tile neighbor = BoardManager.Instance.GetTileAt(neighborCoord);
+        //    if (neighbor != null)
+        //        neighbors.Add(neighbor);
+        //}
 
         return neighbors;
     }
 
     public static int Heuristic(Tile a, Tile b)
     {
-        Vector3Int ac = Vector3Int.RoundToInt(a.BoardCoord);
-        Vector3Int bc = Vector3Int.RoundToInt(b.BoardCoord);
+        Vector3Int ac = a.BoardCoord;
+        Vector3Int bc = b.BoardCoord;
 
         return (Mathf.Abs(ac.x - bc.x) + Mathf.Abs(ac.y - bc.y) + Mathf.Abs(ac.z - bc.z)) / 2;
     }
