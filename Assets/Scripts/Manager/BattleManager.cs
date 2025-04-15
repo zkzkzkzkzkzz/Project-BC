@@ -19,13 +19,13 @@ public class BattleManager : MonoBehaviour
     }
 
 
-
     public void BattleStart()
     {
+        var units = FindObjectsOfType<Unit>();
 
+        foreach (var unit in units)
+            unit.MoveToTarget();
     }
-
-
 
     // @@@@ 디버그용 더미 적 생성
     [SerializeField] private GameObject enemyPrefab;

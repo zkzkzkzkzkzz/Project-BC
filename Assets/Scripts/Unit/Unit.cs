@@ -21,10 +21,12 @@ public class Unit : MonoBehaviour
 
     public TileType curTileType => curTile?.GetTileType() ?? TileType.Bench;
 
+    private Coroutine moveRoutine;
+
     private void Awake()
     {
         mainCam = Camera.main;
-    }
+    }    
 
     public void SetOwnerId(int id)
     {
@@ -113,5 +115,133 @@ public class Unit : MonoBehaviour
     public bool IsDragEnable()
     {
         return GameManager.Instance.IsInPrepare() || curTileType == TileType.Bench;
+    }
+
+
+    /// <summary>
+    /// 자신으로부터 가장 가까운 적 찾기
+    /// </summary>
+    private Unit FindClosestEnemy()
+    {
+        var allUnits = FindObjectsOfType<Unit>();
+        float minDist = float.MaxValue;
+        Unit closestEnemy = null;
+
+        foreach (var unit in allUnits)
+        {
+            if (unit.ownerId == this.ownerId) continue;
+
+            float dist = PathFindingSystem.Heuristic(this.curTile, unit.curTile);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                closestEnemy = unit;
+            }
+        }
+
+        return closestEnemy;
+    }
+
+    /// <summary>
+    /// target의 인접 타일 중 가장 짧은 경로를 가지는 타일 반환
+    /// </summary>
+    private Tile FindBestTileToMove(Unit target)
+    {
+        var neighbors = PathFindingSystem.GetNeighbors(target.curTile);
+
+        Tile bestTile = null;
+        int minDist = int.MaxValue;
+
+        foreach (var neighbor in neighbors)
+        {
+            if (neighbor.IsOccupied()) continue;
+
+            var path = PathFindingSystem.FindPath(this.curTile, neighbor);
+            if (path != null && path.Count < minDist)
+            {
+                bestTile = neighbor;
+                minDist = path.Count;
+            }
+        }
+
+        return bestTile;
+    }
+
+    /// <summary>
+    /// 전투 시작 후 타겟 인접 타일 중 가장 가까운 타일로 이동
+    /// </summary>
+    public void MoveToTarget()
+    {
+        Unit target = FindClosestEnemy();
+        if (target == null) return;
+
+        Tile dest = FindBestTileToMove(target);
+        if (dest == null || dest == curTile)
+            return;
+
+        var path = PathFindingSystem.FindPath(curTile, dest);
+        if (path == null || path.Count < 2)
+            return; // 현재 위치하고 있는 타일이 가장 가까운 타일
+
+        for (int i = 1; i < path.Count; i++)
+        {
+            Tile nextTile = path[i];
+
+            transform.position = nextTile.transform.position + Vector3.up * unitYOffset;
+
+            curTile.SetOccupyingUnit(null);
+            nextTile.SetOccupyingUnit(this);
+            curTile = nextTile;
+        }
+    }
+
+    private IEnumerator MoveRoutine()
+    {
+        if (curTile == null)
+            yield break;
+
+        Unit target = FindClosestEnemy();
+        if (target == null)
+            yield break;
+
+        Tile dest = FindBestTileToMove(target);
+        if (dest == null || dest == curTile)
+            yield break;
+
+        List<Tile> path = PathFindingSystem.FindPath(curTile, dest);
+        if (path == null || path.Count < 2)
+            yield break;
+
+        for (int i = 1; i < path.Count; i++)
+        {
+            Tile nextTile = path[i];
+
+            // 이동
+            transform.position = nextTile.transform.position + Vector3.up * unitYOffset;
+
+            // 점유 정보 갱신
+            curTile.SetOccupyingUnit(null);
+            nextTile.SetOccupyingUnit(this);
+            curTile = nextTile;
+
+            yield return new WaitForSeconds(1f);
+        }
+
+        moveRoutine = null;
+    }
+
+    public void BattleStartAI()
+    {
+        if (moveRoutine == null)
+            moveRoutine = StartCoroutine(MoveRoutine());
+    }
+
+    public void BattleEndAI()
+    {
+        if (moveRoutine != null)
+        {
+            StopCoroutine(moveRoutine);
+            moveRoutine = null;
+        }
     }
 }

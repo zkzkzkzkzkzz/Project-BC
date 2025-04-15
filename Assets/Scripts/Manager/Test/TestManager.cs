@@ -51,7 +51,6 @@ public class TestManager : MonoBehaviour
         {
             GameManager.Instance.SetGameState(GameState.Battle);
             BattleManager.Instance.BattleStart();
-            Debug.Log("전투 시작");
         }
         else
             GameManager.Instance.SetGameState(GameState.Prepare);
@@ -67,8 +66,6 @@ public class TestManager : MonoBehaviour
     {
         BattleManager.Instance.SpawnDummyEnemy(enemyCount);
     }
-
-
 
     public void ClearEnemy()
     {

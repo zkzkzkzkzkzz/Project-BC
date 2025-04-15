@@ -83,7 +83,7 @@ public static class PathFindingSystem
     }
 
 
-    private static List<Tile> GetNeighbors(Tile tile)
+    public static List<Tile> GetNeighbors(Tile tile)
     {
         var neighbors = new List<Tile>();
         foreach (var dir in CubeDirections)
@@ -97,7 +97,7 @@ public static class PathFindingSystem
         return neighbors;
     }
 
-    private static int Heuristic(Tile a, Tile b)
+    public static int Heuristic(Tile a, Tile b)
     {
         Vector3Int ac = Vector3Int.RoundToInt(a.BoardCoord);
         Vector3Int bc = Vector3Int.RoundToInt(b.BoardCoord);
