@@ -186,9 +186,9 @@ public class Unit : MonoBehaviour
             nextTile.SetOccupyingUnit(this);
             SetCurUnitTile(nextTile);
 
-            transform.position = nextTile.transform.position + Vector3.up * unitYOffset;
+            //transform.position = nextTile.transform.position + Vector3.up * unitYOffset;
 
-            yield return new WaitForSeconds(1f);
+            yield return StartCoroutine(MoveSmooth(nextTile));
         }
 
         moveRoutine = null;
@@ -208,5 +208,29 @@ public class Unit : MonoBehaviour
             StopCoroutine(moveRoutine);
             moveRoutine = null;
         }
+    }
+
+    /// <summary>
+    /// 유닛 이동 보간 (임시)
+    /// </summary>
+    private IEnumerator MoveSmooth(Tile nextTile)
+    {
+        Vector3 start = transform.position;
+        Vector3 end = nextTile.transform.position + Vector3.up * unitYOffset;
+
+        float dist = Vector3.Distance(start, end);
+        float duration = dist / 2f;
+
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            transform.position = Vector3.Lerp(start, end, t);
+            yield return null;
+        }
+
+        transform.position = end;
     }
 }
