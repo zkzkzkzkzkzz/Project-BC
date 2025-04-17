@@ -21,7 +21,7 @@ public class BenchManager : MonoBehaviour
             Instance = this;
         else
         {
-            Destroy(Instance);
+            Destroy(gameObject);
             return;
         }
     }
@@ -60,6 +60,8 @@ public class BenchManager : MonoBehaviour
                 Vector3 unitPos = tile.transform.position + Vector3.up;
                 GameObject unitObj = Instantiate(unitPrefab, unitPos, Quaternion.identity);
                 Unit unit = unitObj.GetComponent<Unit>();
+
+                unit.SetOwnerId(PlayerSessionManager.Instance.LocalPlayerId);
 
                 unit.SetCurUnitTile(tile);
                 tile.SetOccupyingUnit(unit);
