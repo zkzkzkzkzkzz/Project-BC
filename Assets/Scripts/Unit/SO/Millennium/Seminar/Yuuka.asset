@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c37182755fc8953469625e39ff1fba0a, type: 3}
   m_Name: Yuuka
   m_EditorClassIdentifier: 
-  Name: Yuuka
+  studentName: 
   icon: {fileID: 0}
   prefab: {fileID: 919132149155446097, guid: a8188fdae3c03d24582e3ee5b05eb456, type: 3}
   starGrade: 1
