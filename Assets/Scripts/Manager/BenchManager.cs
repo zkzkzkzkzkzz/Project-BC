@@ -23,7 +23,7 @@ public class BenchManager : MonoBehaviour
     {
         for (int i = 0; i < benchSize; ++i)
         {
-            Vector3 tilePos = benchStartPos + new Vector3(i * tileSize, 0, 0);
+            Vector3 tilePos = transform.position + benchStartPos + new Vector3(i * tileSize, 0, 0);
             GameObject tileObj = Instantiate(benchPrefab, tilePos, Quaternion.identity, transform);
             tileObj.name = $"BenchTile_{i}";
 
@@ -34,7 +34,7 @@ public class BenchManager : MonoBehaviour
             tile.SetTileType(TileType.Bench);
             tile.BenchIndex = i;
 
-            tileObj.SetActive(false);
+            //tileObj.SetActive(false);
             benchTiles.Add(tile);
             benchUnits.Add(null);
         }

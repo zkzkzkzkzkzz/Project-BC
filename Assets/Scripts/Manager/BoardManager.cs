@@ -46,7 +46,7 @@ public class BoardManager : MonoBehaviour
                 tile.SetTileType(TileType.Board);
                 tile.BoardCoord = new Vector3Int(x, y, z);
 
-                tileObj.SetActive(false);
+                //tileObj.SetActive(false);
                 boardTiles.Add(tile);
                 boardUnits.Add(null);
             }
@@ -56,10 +56,13 @@ public class BoardManager : MonoBehaviour
     private Vector3 CubeToWorldPointy(int x, int y, int z, float r, float gapFactor)
     {
         float effectiveR = r * gapFactor;
-        float worldX = Mathf.Sqrt(3f) * (x + (z * 0.5f)) * effectiveR;
-        float worldZ = 3f / 2f * z * effectiveR;
-        return new Vector3(worldX, 0f, worldZ);
+        float localX = Mathf.Sqrt(3f) * (x + (z * 0.5f)) * effectiveR;
+        float localZ = 3f / 2f * z * effectiveR;    
+
+        Vector3 localPos = new Vector3(localX, 0f, localZ);
+        return transform.position + localPos;
     }
+
 
     /// <summary>
     /// 보드 리스트에 유닛 등록
