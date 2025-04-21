@@ -1,0 +1,79 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+public class ZoneManager : MonoBehaviour
+{
+    public static ZoneManager Instance { get; private set; }
+
+    [SerializeField] private int zoneCount = 1;
+    [SerializeField] private GameObject boardPrefab;
+    [SerializeField] private GameObject benchPrefab;
+    [SerializeField] private Vector3 startPosition = Vector3.zero;
+    [SerializeField] private Vector3 zoneOffset = new Vector3(20f, 0f, 0f); // Zone 간 거리
+
+    private List<Zone> zones = new List<Zone>();
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
+
+    /// <summary>
+    /// zoneCount만큼 Zone을 생성합니다.
+    /// </summary>
+    public void InitializeZones()
+    {
+        zones.Clear();
+
+        for (int i = 0; i < zoneCount; ++i)
+        {
+            Vector3 offset = startPosition + zoneOffset * i;
+
+            GameObject boardObj = Instantiate(boardPrefab, offset, Quaternion.identity);
+            GameObject benchObj = Instantiate(benchPrefab, offset + new Vector3(0f, 0f, -10f), Quaternion.identity);
+
+            BoardManager board = boardObj.GetComponent<BoardManager>();
+            BenchManager bench = benchObj.GetComponent<BenchManager>();
+
+            if (board != null) board.GenerateGrid();
+            if (bench != null) bench.GenerateBench();
+
+            Zone zone = new Zone();
+            zone.Initialize(i, board, bench);
+
+            zones.Add(zone);
+        }
+    }
+
+    /// <summary>
+    /// 특정 OwnerId를 가진 Zone을 가져옵니다.
+    /// </summary>
+    public Zone GetZoneByOwner(int ownerId)
+    {
+        return zones.FirstOrDefault(z => z.OwnerId == ownerId);
+    }
+
+    /// <summary>
+    /// 로컬 플레이어가 소유한 Zone을 가져옵니다.
+    /// </summary>
+    public Zone GetMyZone()
+    {
+        return GetZoneByOwner(PlayerSessionManager.Instance.LocalPlayerId);
+    }
+
+    /// <summary>
+    /// 전체 Zone 리스트를 반환합니다.
+    /// </summary>
+    public List<Zone> GetAllZones()
+    {
+        return zones;
+    }
+}
