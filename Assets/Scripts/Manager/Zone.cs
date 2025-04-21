@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Zone : MonoBehaviour
+public class Zone
 {
     public int OwnerId { get; private set; }
     public BoardManager Board {  get; private set; }
