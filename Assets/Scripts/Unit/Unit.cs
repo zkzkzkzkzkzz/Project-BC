@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
-    private int ownerId;            // 유닛 오너 고유 id
-    public int OwnerId => ownerId;  // 외부 읽기 전용 프로퍼티 제공
+    public int OwnerId { get; set; } = -1;
 
     private Camera mainCam;
     private bool isDragging = false;
@@ -26,11 +25,6 @@ public class Unit : MonoBehaviour
     private void Awake()
     {
         mainCam = Camera.main;
-    }    
-
-    public void SetOwnerId(int id)
-    {
-        ownerId = id;
     }
 
     private void OnMouseDown()
@@ -111,7 +105,7 @@ public class Unit : MonoBehaviour
         Unit closestEnemy = null;
         foreach (var unit in Units)
         {
-            if (unit.ownerId == ownerId || unit.curTile == null) continue;
+            if (unit.OwnerId == OwnerId || unit.curTile == null) continue;
 
             float dist = PathFindingSystem.Heuristic(curTile, unit.curTile);
             if (dist < minDist)

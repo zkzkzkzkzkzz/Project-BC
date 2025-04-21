@@ -63,7 +63,7 @@ public class BenchManager : MonoBehaviour
                 GameObject unitObj = Instantiate(unitPrefab, unitPos, Quaternion.identity);
                 Unit unit = unitObj.GetComponent<Unit>();
 
-                unit.SetOwnerId(PlayerSessionManager.Instance.LocalPlayerId);
+                unit.OwnerId = PlayerSessionManager.Instance.LocalPlayerId;
                 unit.SetCurUnitTile(benchTiles[i]);
                 benchTiles[i].SetOccupyingUnit(unit);
 
