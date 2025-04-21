@@ -15,6 +15,7 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private float gap = 1.1f;
 
     private List<Tile> boardTiles = new List<Tile>();
+    [SerializeField] private List<Unit> boardUnits = new List<Unit>();
 
     private void Awake()
     {
@@ -60,6 +61,7 @@ public class BoardManager : MonoBehaviour
 
                 tileObj.SetActive(false);
                 boardTiles.Add(tile);
+                boardUnits.Add(null);
             }
         }
     }
@@ -71,6 +73,28 @@ public class BoardManager : MonoBehaviour
         float worldZ = 3f / 2f * z * effectiveR;
         return new Vector3(worldX, 0f, worldZ);
     }
+
+    /// <summary>
+    /// 보드 리스트에 유닛 등록
+    /// </summary>
+    public void RegisterUnitToBoard(Unit unit, Tile to)
+    {
+        int idx = boardTiles.IndexOf(to);
+        if (idx >= 0)
+            boardUnits[idx] = unit;
+    }
+
+    /// <summary>
+    /// 보드 리스트에서 유닛 해제
+    /// </summary>
+    public void UnregisterUnitFromBoard(Unit unit)
+    {
+        int idx = boardUnits.IndexOf(unit);
+        if (idx >= 0)
+            boardUnits[idx] = null;
+    }
+
+
 
     public void ShowHexGrid(bool show)
     {
@@ -97,5 +121,10 @@ public class BoardManager : MonoBehaviour
                 return tile;
 
         return null;
+    }
+
+    public List<Unit> GetBoardUnits()
+    {
+        return boardUnits;
     }
 }

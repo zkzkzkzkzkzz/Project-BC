@@ -13,6 +13,7 @@ public class BenchManager : MonoBehaviour
     [SerializeField] private Vector3 benchStartPos;
 
     private List<Tile> benchTiles = new List<Tile>();
+    [SerializeField] private List<Unit> benchUnits = new List<Unit>();   // 벤치에 위치한 유닛
     private int unitCount = 0;  // 디버그용
 
     private void Awake()
@@ -48,25 +49,29 @@ public class BenchManager : MonoBehaviour
 
             tileObj.SetActive(false);
             benchTiles.Add(tile);
+            benchUnits.Add(null);
         }
     }
 
     public bool PlaceUnitOnBench()
     {
-        foreach (Tile tile in benchTiles)
+        for (int i = 0; i < benchUnits.Count; ++i)
         {
-            if (!tile.IsOccupied())
+            if (benchUnits[i] == null)
             {
-                Vector3 unitPos = tile.transform.position + Vector3.up;
+                Vector3 unitPos = benchTiles[i].transform.position + Vector3.up;
                 GameObject unitObj = Instantiate(unitPrefab, unitPos, Quaternion.identity);
                 Unit unit = unitObj.GetComponent<Unit>();
 
                 unit.SetOwnerId(PlayerSessionManager.Instance.LocalPlayerId);
+                unit.SetCurUnitTile(benchTiles[i]);
+                benchTiles[i].SetOccupyingUnit(unit);
 
-                unit.SetCurUnitTile(tile);
-                tile.SetOccupyingUnit(unit);
+                benchUnits[i] = unit;
 
                 // @@디버그용
+                unit.name = $"MyUnit_{unitCount}";
+                
                 var renderer = unit.GetComponentInChildren<Renderer>();
                 if (renderer != null)
                 {
@@ -85,6 +90,28 @@ public class BenchManager : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// 벤치 리스트에 유닛 등록
+    /// </summary>
+    public void RegisterUnitToBench(Unit unit, Tile to)
+    {
+        int idx = benchTiles.IndexOf(to);
+        if (idx >= 0)
+            benchUnits[idx] = unit;
+    }
+
+    /// <summary>
+    /// 벤치 리스트에서 유닛 해제
+    /// </summary>
+    public void UnregisterUnitFromBench(Unit unit)
+    {
+        int idx = benchUnits.IndexOf(unit);
+        if (idx >= 0)
+            benchUnits[idx] = null;
+    }
+
+
+
     public void ShowBenchGrid(bool show)
     {
         foreach (var tile in benchTiles)
@@ -101,5 +128,10 @@ public class BenchManager : MonoBehaviour
     public List<Tile> GetBenchTiles()
     {
         return benchTiles;
+    }
+
+    public List<Unit> GetBenchUnits()
+    {
+        return benchUnits;
     }
 }
