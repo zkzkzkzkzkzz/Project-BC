@@ -21,24 +21,13 @@ public class TestManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 그리드 활성화 / 비활성화
+    /// 게임 시작. 보드 및 벤치 생성
     /// </summary>
-    private bool bGrid = false;
-    public void ToggleGrid()
+    public void GameStart()
     {
-        bGrid = !bGrid;
-        BoardManager.Instance.ShowHexGrid(bGrid);
-        BenchManager.Instance.ShowBenchGrid(bGrid);
+
     }
 
-    /// <summary>
-    /// 유닛 구매
-    /// 구매된 유닛은 벤치에 배치
-    /// </summary>
-    public void PurchaseUnit()
-    {
-        BenchManager.Instance.PlaceUnitOnBench();
-    }
 
     /// <summary>
     /// 게임 상태 전환
@@ -54,31 +43,5 @@ public class TestManager : MonoBehaviour
         }
         else
             GameManager.Instance.SetGameState(GameState.Prepare);
-    }
-
-
-    [SerializeField] private int enemyCount = 1;
-    /// <summary>
-    /// 디버그용 더미 적 생성
-    /// enemyCount : 생성할 적 수
-    /// </summary>
-    public void SpawnDummyEnemies()
-    {
-        BattleManager.Instance.SpawnDummyEnemy(enemyCount);
-    }
-
-    public void ClearEnemy()
-    {
-        var tiles = BoardManager.Instance.GetBoardTiles();
-
-        foreach (Tile tile in tiles)
-        {
-            if (tile.IsOccupied() && tile.BoardCoord.z > 3f)
-            {
-                Unit unit = tile.GetOccupyingUnit();
-                Destroy(unit.gameObject);
-                tile.SetOccupyingUnit(null);
-            }
-        }
-    }
+    }    
 }

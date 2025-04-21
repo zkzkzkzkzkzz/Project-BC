@@ -131,17 +131,19 @@ public class Unit : MonoBehaviour
 
     private IEnumerator GreedyMoveRoutine()
     {
+        BoardManager board = ZoneManager.Instance.GetMyZone().Board;
+
         while (GameManager.Instance.IsInBattle())
         {
             moveTargetUnit = FindClosestEnemy();
             if (moveTargetUnit == null || moveTargetUnit.curTile == null)
                 break;
 
-            if (IsAdjacentTo(moveTargetUnit)) break;
+            if (IsAdjacentTo(moveTargetUnit, board)) break;
 
             Tile targetTile = moveTargetUnit.curTile;
 
-            List<Tile> path = PathFindingSystem.FindPath(curTile, targetTile);
+            List<Tile> path = PathFindingSystem.FindPath(curTile, targetTile, board);
             if (path == null || path.Count < 2)
             {
                 yield return new WaitForSeconds(0.5f);
@@ -172,9 +174,9 @@ public class Unit : MonoBehaviour
         curTile?.ClearReservation();
     }
 
-    private bool IsAdjacentTo(Unit target)
+    private bool IsAdjacentTo(Unit target, BoardManager board)
     {
-        var neighbors = PathFindingSystem.GetNeighbors(curTile);
+        var neighbors = PathFindingSystem.GetNeighbors(curTile, board);
         return neighbors.Contains(target.curTile);
     }
 

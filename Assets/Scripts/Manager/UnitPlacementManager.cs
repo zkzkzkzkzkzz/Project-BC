@@ -22,33 +22,41 @@ public class UnitPlacementManager : MonoBehaviour
 
     private void UpdateMove(Unit unit, Tile from, Tile to)
     {
-        if (BenchManager.Instance.IsBenchTile(from))
-            BenchManager.Instance.UnregisterUnitFromBench(unit);
-        else if (BoardManager.Instance.IsBoardTile(from))
-            BoardManager.Instance.UnregisterUnitFromBoard(unit);
+        Zone zone = ZoneManager.Instance.GetMyZone();
+        BoardManager board = zone.Board;
+        BenchManager bench = zone.Bench;
 
-        if (BenchManager.Instance.IsBenchTile(to))
-            BenchManager.Instance.RegisterUnitToBench(unit, to);
-        else if (BoardManager.Instance.IsBoardTile(to))
-            BoardManager.Instance.RegisterUnitToBoard(unit, to);
+        if (bench.IsBenchTile(from))
+            bench.UnregisterUnitFromBench(unit);
+        else if (board.IsBoardTile(from))
+            board.UnregisterUnitFromBoard(unit);
+
+        if (bench.IsBenchTile(to))
+            bench.RegisterUnitToBench(unit, to);
+        else if (board.IsBoardTile(to))
+            board.RegisterUnitToBoard(unit, to);
     }
 
     private void UpdateSwap(Unit a, Unit b)
     {
+        Zone zone = ZoneManager.Instance.GetMyZone();
+        BoardManager board = zone.Board;
+        BenchManager bench = zone.Bench;
+
         Tile tileA = a.curTile;
         Tile tileB = b.curTile;
 
         if (tileA == null || tileB == null) return;
 
-        if (BenchManager.Instance.IsBenchTile(tileA))
-            BenchManager.Instance.RegisterUnitToBench(a, tileA);
-        else if (BoardManager.Instance.IsBoardTile(tileA))
-            BoardManager.Instance.RegisterUnitToBoard(a, tileA);
+        if (bench.IsBenchTile(tileA))
+            bench.RegisterUnitToBench(a, tileA);
+        else if (board.IsBoardTile(tileA))
+            board.RegisterUnitToBoard(a, tileA);
 
-        if (BenchManager.Instance.IsBenchTile(tileB))
-            BenchManager.Instance.RegisterUnitToBench(b, tileB);
-        else if (BoardManager.Instance.IsBoardTile(tileB))
-            BoardManager.Instance.RegisterUnitToBoard(b, tileB);
+        if (bench.IsBenchTile(tileB))
+            bench.RegisterUnitToBench(b, tileB);
+        else if (board.IsBoardTile(tileB))
+            board.RegisterUnitToBoard(b, tileB);
     }
 
     /// <summary>
