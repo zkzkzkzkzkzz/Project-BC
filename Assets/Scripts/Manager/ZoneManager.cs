@@ -76,4 +76,43 @@ public class ZoneManager : MonoBehaviour
     {
         return zones;
     }
+
+    public void InitializeZonesWithLayout(Vector2Int[] layout, float spacing, int zoneCount)
+    {
+        zones.Clear();
+
+        for (int i = 0; i < zoneCount; ++i)
+        {
+            GameObject zoneRoot = new GameObject($"Zone_{i}");
+
+            Vector2Int gridPos = layout[i];
+            Vector3 worldPos = new Vector3(gridPos.x * spacing, 0f, gridPos.y * spacing);
+
+            GameObject boardObj = Instantiate(boardPrefab, worldPos, Quaternion.identity, zoneRoot.transform);
+            GameObject benchObj = Instantiate(benchPrefab, worldPos + new Vector3(0f, 0f, -2f), Quaternion.identity, zoneRoot.transform);
+
+            BoardManager board = boardObj.GetComponent<BoardManager>();
+            BenchManager bench = benchObj.GetComponent<BenchManager>();
+
+            if (board != null) board.GenerateGrid();
+            if (bench != null) bench.GenerateBench();
+
+            Zone zone = new Zone();
+            zone.Initialize(i, board, bench);
+
+            zones.Add(zone);
+        }
+    }
+
+    public void ClearZones()
+    {
+        foreach (var zone in zones)
+        {
+            if (zone.Board != null)
+                Destroy(zone.Board.gameObject);
+            if (zone.Bench != null)
+                Destroy(zone.Bench.gameObject);
+        }
+        zones.Clear();
+    }
 }
