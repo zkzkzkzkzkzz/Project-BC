@@ -18,36 +18,52 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    [SerializeField] private int myOwnerId = 0;
+    private List<Unit> myUnits = new List<Unit>();
+    private List<Unit> enemyUnits = new List<Unit>();
 
-    public void BattleStart()
+    /// <summary>
+    /// 유닛 등록
+    /// </summary>
+    public void RegisterUnit(Unit unit)
     {
-        List<Unit> sortedUnits = SortedMyUnits(0);
-        foreach (Unit unit in sortedUnits)
-            unit.BattleStartAI();
-
-        List<Unit> sortedEnemies = SortedMyUnits(1);
-        foreach (Unit unit in sortedEnemies)
-            unit.BattleStartAI();
+        if (unit.OwnerId == myOwnerId)
+            myUnits.Add(unit);
+        else
+            enemyUnits.Add(unit);
     }
 
-    public List<Unit> SortedMyUnits(int ownerId)
+    /// <summary>
+    /// 유닛 해제
+    /// </summary>
+    public void UnregisterUnit(Unit unit)
     {
-        List<Unit> allies = new List<Unit>();
-        List<Unit> enemies = new List<Unit>();
+        if (unit.OwnerId == myOwnerId)
+            myUnits.Remove(unit);
+        else
+            enemyUnits.Remove(unit);
+    }
 
-        foreach (var unit in FindObjectsOfType<Unit>())
-        {
-            if (unit.curTile == null || unit.curTileType == TileType.Bench) continue;
 
-            if (unit.OwnerId == ownerId)
-                allies.Add(unit);
-            else
-                enemies.Add(unit);
-        }
 
-        allies.Sort(new UnitComparer(enemies));
 
-        return allies;
+    /// <summary>
+    /// 전투 시작
+    /// </summary>
+    public void BattleStart()
+    {
+        //List<Unit> sortedUnits = SortedMyUnits(0);
+        //foreach (Unit unit in sortedUnits)
+        //    unit.BattleStartAI();
+
+        //List<Unit> sortedEnemies = SortedMyUnits(1);
+        //foreach (Unit unit in sortedEnemies)
+        //    unit.BattleStartAI();
+
+        myUnits.Sort(new UnitComparer(enemyUnits));
+
+        foreach (var unit in myUnits)
+            unit.BattleStartAI();
     }
 
 
@@ -68,13 +84,23 @@ public class BattleManager : MonoBehaviour
          
             Vector3 spawnPos = tile.transform.position + Vector3.up * unitYoffset;
             GameObject enemyObj = Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
-            Unit enemy = enemyObj.GetComponent<Unit>();
 
-            enemy.SetOwnerId(1);
+            Unit enemy = enemyObj.GetComponent<Unit>();
+            enemy.SetOwnerId(GetEnemyOwnerId());
             enemy.SetCurUnitTile(tile);
             tile.SetOccupyingUnit(enemy);
 
+            RegisterUnit(enemy);
+
             enemyObj.name = $"DummyEnemy_{i}";
         }
+    }
+
+    /// <summary>
+    /// 현재 플레이어의 적 OwnerId 반환 (테스트용)
+    /// </summary>
+    private int GetEnemyOwnerId()
+    {
+        return (myOwnerId == 0) ? 1 : 0;
     }
 }
