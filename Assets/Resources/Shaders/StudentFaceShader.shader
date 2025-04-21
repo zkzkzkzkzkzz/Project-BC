@@ -6,7 +6,6 @@ Shader "Custom/StudentFaceShader"
         _MouthTex("Mouth Texture", 2D) = "white" {}
         _MouthMask("Mouth Mask", 2D) = "white" {}
 
-        [Toggle]_UseMouth("Use Mouth", Float) = 1
         [IntRange]_Row("Row (U)", Range(0,7)) = 0
         [IntRange]_Col("Col (V)", Range(0,7)) = 0
 
@@ -15,7 +14,7 @@ Shader "Custom/StudentFaceShader"
 
     SubShader
     {
-        Tags { "RenderType"="TransparentCutout" }
+        Tags { "RenderType"="Transparent" }
         LOD 200
         Cull Back
 
@@ -24,7 +23,6 @@ Shader "Custom/StudentFaceShader"
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            #pragma multi_compile_local _ _USEMOUTH_ON
             #include "UnityCG.cginc"
 
             sampler2D _BaseTex;
@@ -68,26 +66,22 @@ Shader "Custom/StudentFaceShader"
                 fixed4 finalColor = baseColor;
                 float alpha = 1.0;
 
-                #ifdef _USEMOUTH_ON
-                {
-                    float2 mouthCellSize = 0.125;  // 8x8 그리드
+                float2 mouthCellSize = 0.125;  // 8x8 그리드
 
-                    // 입 텍스처 좌상단 좌표
-                    float2 mouthOffset;
-                    mouthOffset.x = _Col * mouthCellSize;
-                    mouthOffset.y = 1.0 - (_Row + 1) * mouthCellSize;
+                // 입 텍스처 좌상단 좌표
+                float2 mouthOffset;
+                mouthOffset.x = _Col * mouthCellSize;
+                mouthOffset.y = 1.0 - (_Row + 1) * mouthCellSize;
 
-                    float2 mouthUV = (i.uv * 0.5) + mouthOffset;
+                float2 mouthUV = (i.uv * 0.5) + mouthOffset;
 
-                    fixed4 mouthColor = tex2D(_MouthTex, mouthUV);
+                fixed4 mouthColor = tex2D(_MouthTex, mouthUV);
 
-                    float maskValue = saturate(mouthMask.r);
-                    float mouthAlpha = mouthColor.a * maskValue;
+                float maskValue = saturate(mouthMask.r);
+                float mouthAlpha = mouthColor.a * maskValue;
 
-                    finalColor = lerp(baseColor, mouthColor, mouthAlpha);
-                    alpha = (1.0 - maskValue) + mouthAlpha;
-                }
-                #endif
+                finalColor = lerp(baseColor, mouthColor, mouthAlpha);
+                alpha = (1.0 - maskValue) + mouthAlpha;
 
                 clip(alpha - _Cutoff);
                 return finalColor;
