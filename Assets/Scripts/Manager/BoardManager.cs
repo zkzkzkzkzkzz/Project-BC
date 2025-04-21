@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class BoardManager : MonoBehaviour
 {
-    public static BoardManager Instance { get; private set; }
-
     [SerializeField] private GameObject tilePrefab;
     [SerializeField] private float radius;  // 타일 크기
 
@@ -17,23 +15,12 @@ public class BoardManager : MonoBehaviour
     private List<Tile> boardTiles = new List<Tile>();
     [SerializeField] private List<Unit> boardUnits = new List<Unit>();
 
-    private void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
-    }
-
     private void Start()
     {
-        GenerateGrid();
+        //GenerateGrid();
     }
 
-    private void GenerateGrid()
+    public void GenerateGrid()
     {
         for (int row = 0; row < rows; row++)
         {

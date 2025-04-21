@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class BenchManager : MonoBehaviour
 {
-    public static BenchManager Instance { get; private set; }
-
     [SerializeField] private GameObject unitPrefab;
     [SerializeField] private GameObject benchPrefab;
     [SerializeField] private int benchSize = 8;
@@ -16,23 +14,12 @@ public class BenchManager : MonoBehaviour
     [SerializeField] private List<Unit> benchUnits = new List<Unit>();   // 벤치에 위치한 유닛
     private int unitCount = 0;  // 디버그용
 
-    private void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
-    }
-
     private void Start()
     {
-        GenerateBench();
+        //GenerateBench();
     }
 
-    private void GenerateBench()
+    public void GenerateBench()
     {
         for (int i = 0; i < benchSize; ++i)
         {
