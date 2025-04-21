@@ -47,6 +47,6 @@ MonoBehaviour:
   unitPrefab: {fileID: 3508773267556065923, guid: 0b61643d96ea9624280a18a32ea1ad7c, type: 3}
   benchPrefab: {fileID: 1538203146028809503, guid: eaf0492f8e2a426408732c639eb3bad0, type: 3}
   benchSize: 8
-  tileSize: 2
+  tileSize: 1.5
   benchStartPos: {x: 0, y: 0, z: 0}
   benchUnits: []
