@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
-    public int OwnerId { get; set; } = -1;
-
     private Camera mainCam;
     private bool isDragging = false;
     private Plane dragPlane;
@@ -107,7 +105,9 @@ public class Unit : MonoBehaviour
         Unit closestEnemy = null;
         foreach (var unit in Units)
         {
-            if (unit.OwnerId == OwnerId || unit.curTile == null) continue;
+            if (unit.zone == null || zone == null) continue;
+
+            if (unit.zone.OwnerId == zone.OwnerId || unit.curTile == null) continue;
 
             float dist = PathFindingSystem.Heuristic(curTile, unit.curTile);
             if (dist < minDist)
