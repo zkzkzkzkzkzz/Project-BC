@@ -40,9 +40,6 @@ public class UnitPlacementManager : MonoBehaviour
     private void UpdateSwap(Unit a, Unit b)
     {
         Zone zoneA = a.zone;
-        Zone zoneB = b.zone;
-
-        if ((zoneA == null || zoneB == null) || zoneA != zoneB) return;
 
         BoardManager board = zoneA.Board;
         BenchManager bench = zoneA.Bench;
@@ -70,6 +67,13 @@ public class UnitPlacementManager : MonoBehaviour
     {
         Tile from = a.curTile;
 
+        if (a.zone != to.zone)
+        {
+            Debug.LogWarning("다른 Zone으로 이동할 수 없습니다");
+            a.transform.position = from.transform.position + Vector3.up * a.unitYOffset;
+            return;
+        }
+
         a.transform.position = to.transform.position + Vector3.up * a.unitYOffset;
 
         from.SetOccupyingUnit(null);
@@ -86,6 +90,13 @@ public class UnitPlacementManager : MonoBehaviour
     {
         Tile tileA = a.curTile;
         Tile tileB = b.curTile;
+
+        if (a.zone != b.zone)
+        {
+            Debug.LogWarning("다른 Zone유닛과 스왑할 수 없습니다");
+            a.transform.position = tileA.transform.position + Vector3.up * a.unitYOffset;
+            return;
+        }
 
         a.transform.position = tileB.transform.position + Vector3.up * a.unitYOffset;
         b.transform.position = tileA.transform.position + Vector3.up * b.unitYOffset;
