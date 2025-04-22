@@ -116,7 +116,13 @@ public class UnitPlacementManager : MonoBehaviour
     // 이동 가능 검증 함수들
     private bool CanMove(Unit a, Tile to)
     {
-        return a != null && to != null && a.zone == to.zone && to.IsAvailable();
+        if (a == null || to == null) return false;
+
+        // Battle 상태일 때는 zone 무시
+        if (GameManager.Instance.IsInBattle())
+            return to.IsAvailable();
+        else
+            return a.zone == to.zone && to.IsAvailable();
     }
 
     private bool CanSwap(Unit a, Unit b)
