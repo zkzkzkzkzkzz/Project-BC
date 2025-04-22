@@ -20,6 +20,8 @@ public class Unit : MonoBehaviour
 
     public TileType curTileType => curTile?.GetTileType() ?? TileType.Bench;
 
+    public Zone zone { get; set; }  // 유닛이 속해있는 구역
+
     private Coroutine moveRoutine;
 
     private void Awake()
@@ -164,8 +166,6 @@ public class Unit : MonoBehaviour
             nextTile.Reserve(this);
             nextTile.SetOccupyingUnit(this);
             SetCurUnitTile(nextTile);
-
-            //transform.position = nextTile.transform.position + Vector3.up * unitYOffset;
 
             yield return StartCoroutine(MoveSmooth(nextTile));
         }
