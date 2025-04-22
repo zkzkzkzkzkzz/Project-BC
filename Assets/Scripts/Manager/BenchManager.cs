@@ -40,7 +40,7 @@ public class BenchManager : MonoBehaviour
         }
     }
 
-    public bool PlaceUnitOnBench()
+    public bool PlaceUnitOnBench(int ownerId)
     {
         for (int i = 0; i < benchUnits.Count; ++i)
         {
@@ -50,11 +50,15 @@ public class BenchManager : MonoBehaviour
                 GameObject unitObj = Instantiate(unitPrefab, unitPos, Quaternion.identity);
                 Unit unit = unitObj.GetComponent<Unit>();
 
-                unit.OwnerId = PlayerSessionManager.Instance.LocalPlayerId;
+                unit.OwnerId = ownerId;
+                unit.zone = ZoneManager.Instance.GetZoneByOwner(ownerId);
                 unit.SetCurUnitTile(benchTiles[i]);
                 benchTiles[i].SetOccupyingUnit(unit);
 
                 benchUnits[i] = unit;
+
+                unit.transform.SetParent(unit.zone.UnitsRoot);
+                unit.transform.localPosition = unitPos;
 
                 // @@디버그용
                 unit.name = $"MyUnit_{unitCount}";

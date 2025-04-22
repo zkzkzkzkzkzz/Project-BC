@@ -69,7 +69,7 @@ public class TestManager : MonoBehaviour
         foreach (var zone in ZoneManager.Instance.GetAllZones())
         {
             if (zone.OwnerId == playerId)
-                zone.Bench.PlaceUnitOnBench();
+                zone.Bench.PlaceUnitOnBench(playerId);
         }
     }
 }

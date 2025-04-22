@@ -22,7 +22,7 @@ public class UnitPlacementManager : MonoBehaviour
 
     private void UpdateMove(Unit unit, Tile from, Tile to)
     {
-        Zone zone = ZoneManager.Instance.GetMyZone();
+        Zone zone = unit.zone;
         BoardManager board = zone.Board;
         BenchManager bench = zone.Bench;
 
@@ -39,9 +39,13 @@ public class UnitPlacementManager : MonoBehaviour
 
     private void UpdateSwap(Unit a, Unit b)
     {
-        Zone zone = ZoneManager.Instance.GetMyZone();
-        BoardManager board = zone.Board;
-        BenchManager bench = zone.Bench;
+        Zone zoneA = a.zone;
+        Zone zoneB = b.zone;
+
+        if ((zoneA == null || zoneB == null) || zoneA != zoneB) return;
+
+        BoardManager board = zoneA.Board;
+        BenchManager bench = zoneA.Bench;
 
         Tile tileA = a.curTile;
         Tile tileB = b.curTile;
