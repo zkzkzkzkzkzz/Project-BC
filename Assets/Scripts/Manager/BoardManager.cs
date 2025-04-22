@@ -68,6 +68,18 @@ public class BoardManager : MonoBehaviour
         return transform.position + localPos;
     }
 
+    /// <summary>
+    /// 현재 좌표 180도 회전시켜서 대응되는 타일의 좌표를 리턴
+    /// </summary>
+    private Vector3Int GetOppositeCoordinates(Vector3Int origin)
+    {
+        int x = origin.x;
+        int y = origin.y;
+        int z = origin.z;
+
+        return new Vector3Int(-x + 3, -y - 10, -z + 7);
+    }
+
 
     /// <summary>
     /// 보드 리스트에 유닛 등록
