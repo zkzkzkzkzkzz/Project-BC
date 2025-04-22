@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -20,8 +21,50 @@ public class UnitPlacementManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 빈 타일로 유닛 배치 요청
+    /// </summary>
+    public void RequestMove(Unit a, Tile to)
+    {
+        Tile from = a.curTile;
+        if (CanMove(a, to))
+            UpdateMove(a, from, to);
+        else
+        {
+            Debug.LogWarning("다른 Zone으로 이동할 수 없습니다");
+            a.transform.position = from.transform.position + Vector3.up * a.unitYOffset;
+            return;
+        }
+    }
+
+    /// <summary>
+    /// 유닛끼리 스왑 요청
+    /// </summary>
+    public void RequestSwap(Unit a, Unit b)
+    {
+        Tile tileA = a.curTile;
+        Tile tileB = b.curTile;
+
+        if (CanSwap(a, b))
+            UpdateSwap(a, b);
+        else
+        {
+            Debug.LogWarning("다른 Zone유닛과 스왑할 수 없습니다");
+            a.transform.position = tileA.transform.position + Vector3.up * a.unitYOffset;
+            b.transform.position = tileB.transform.position + Vector3.up * b.unitYOffset;
+            return;
+        }
+    }
+
+
     private void UpdateMove(Unit unit, Tile from, Tile to)
     {
+        unit.transform.position = to.transform.position + Vector3.up * unit.unitYOffset;
+
+        from.SetOccupyingUnit(null);
+        to.SetOccupyingUnit(unit);
+        unit.SetCurUnitTile(to);
+
         Zone zone = unit.zone;
         BoardManager board = zone.Board;
         BenchManager bench = zone.Bench;
@@ -47,6 +90,15 @@ public class UnitPlacementManager : MonoBehaviour
         Tile tileA = a.curTile;
         Tile tileB = b.curTile;
 
+        a.transform.position = tileB.transform.position + Vector3.up * a.unitYOffset;
+        b.transform.position = tileA.transform.position + Vector3.up * b.unitYOffset;
+
+        tileA.SetOccupyingUnit(b);
+        tileB.SetOccupyingUnit(a);
+
+        a.SetCurUnitTile(tileB);
+        b.SetCurUnitTile(tileA);
+
         if (tileA == null || tileB == null) return;
 
         if (bench.IsBenchTile(tileA))
@@ -60,53 +112,15 @@ public class UnitPlacementManager : MonoBehaviour
             board.RegisterUnitToBoard(b, tileB);
     }
 
-    /// <summary>
-    /// 빈 타일로 유닛 배치 요청
-    /// </summary>
-    public void RequestMove(Unit a, Tile to)
+
+    // 이동 가능 검증 함수들
+    private bool CanMove(Unit a, Tile to)
     {
-        Tile from = a.curTile;
-
-        if (a.zone != to.zone)
-        {
-            Debug.LogWarning("다른 Zone으로 이동할 수 없습니다");
-            a.transform.position = from.transform.position + Vector3.up * a.unitYOffset;
-            return;
-        }
-
-        a.transform.position = to.transform.position + Vector3.up * a.unitYOffset;
-
-        from.SetOccupyingUnit(null);
-        to.SetOccupyingUnit(a);
-        a.SetCurUnitTile(to);
-
-        UpdateMove(a, from, to);
+        return a != null && to != null && a.zone == to.zone && to.IsAvailable();
     }
 
-    /// <summary>
-    /// 유닛끼리 스왑 요청
-    /// </summary>
-    public void RequestSwap(Unit a, Unit b)
+    private bool CanSwap(Unit a, Unit b)
     {
-        Tile tileA = a.curTile;
-        Tile tileB = b.curTile;
-
-        if (a.zone != b.zone)
-        {
-            Debug.LogWarning("다른 Zone유닛과 스왑할 수 없습니다");
-            a.transform.position = tileA.transform.position + Vector3.up * a.unitYOffset;
-            return;
-        }
-
-        a.transform.position = tileB.transform.position + Vector3.up * a.unitYOffset;
-        b.transform.position = tileA.transform.position + Vector3.up * b.unitYOffset;
-
-        tileA.SetOccupyingUnit(b);
-        tileB.SetOccupyingUnit(a);
-
-        a.SetCurUnitTile(tileB);
-        b.SetCurUnitTile(tileA);
-
-        UpdateSwap(a, b);
+        return a != null && b != null && a.zone == b.zone;
     }
 }
