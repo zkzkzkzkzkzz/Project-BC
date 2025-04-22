@@ -27,7 +27,7 @@ public class ZoneManager : MonoBehaviour
     }
 
     /// <summary>
-    /// zoneCount만큼 Zone을 생성합니다.
+    /// zoneCount만큼 Zone을 생성
     /// </summary>
     public void InitializeZones()
     {
@@ -54,7 +54,7 @@ public class ZoneManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 특정 OwnerId를 가진 Zone을 가져옵니다.
+    /// 특정 OwnerId를 가진 Zone을 가져온다
     /// </summary>
     public Zone GetZoneByOwner(int ownerId)
     {
@@ -62,7 +62,7 @@ public class ZoneManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 로컬 플레이어가 소유한 Zone을 가져옵니다.
+    /// 로컬 플레이어가 소유한 Zone을 가져온다
     /// </summary>
     public Zone GetMyZone()
     {
@@ -70,14 +70,14 @@ public class ZoneManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 전체 Zone 리스트를 반환합니다.
+    /// 전체 Zone 리스트를 반환
     /// </summary>
     public List<Zone> GetAllZones()
     {
         return zones;
     }
 
-    public void InitializeZonesWithLayout(Vector2Int[] layout, float spacing, int zoneCount)
+    public void InitializeZones(Vector2Int[] layout, float spacing)
     {
         zones.Clear();
 

@@ -20,8 +20,6 @@ public class TestManager : MonoBehaviour
         }
     }
 
-    [SerializeField] private ZoneManager zoneManager;
-    [SerializeField] private int zoneCount = 1;
     [SerializeField] private float tileSpacing = 20f; // Zone 간 간격 조정용
 
     private readonly Vector2Int[] zoneGridPositions = new Vector2Int[]
@@ -40,8 +38,8 @@ public class TestManager : MonoBehaviour
     {
         Debug.Log("[TestManager] GameStart 호출됨.");
 
-        zoneManager.ClearZones(); // 혹시 기존 Zone이 있다면 초기화
-        zoneManager.InitializeZonesWithLayout(zoneGridPositions, tileSpacing, zoneCount);
+        ZoneManager.Instance.ClearZones(); // 혹시 기존 Zone이 있다면 초기화
+        ZoneManager.Instance.InitializeZones(zoneGridPositions, tileSpacing);
     }
 
 
@@ -59,5 +57,19 @@ public class TestManager : MonoBehaviour
         }
         else
             GameManager.Instance.SetGameState(GameState.Prepare);
-    }    
+    }
+
+
+    [SerializeField] private int playerId = 0;
+    /// <summary>
+    /// 유닛 구매
+    /// </summary>
+    public void PurchaseUnit()
+    {
+        foreach (var zone in ZoneManager.Instance.GetAllZones())
+        {
+            if (zone.OwnerId == playerId)
+                zone.Bench.PlaceUnitOnBench();
+        }
+    }
 }
