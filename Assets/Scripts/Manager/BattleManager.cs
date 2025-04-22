@@ -24,54 +24,54 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     public void BattleStart()
     {
-        //List<Unit> allUnits = BoardManager.Instance.GetBoardUnits();
+        Zone homeZone = ZoneManager.Instance.GetZoneByOwner(0);
+        Zone awayZone = ZoneManager.Instance.GetZoneByOwner(1);
 
-        //List<Unit> myUnits = new List<Unit>();
-        //List<Unit> enemyUnits = new List<Unit>();
+        BoardManager homeBoard = homeZone.Board;
+        List<Unit> awayUnits = awayZone.Board.GetBoardUnits();
 
-        //foreach (Unit unit in allUnits)
-        //{
-        //    if (unit == null) continue;
+        List<Unit> battleUnits = new List<Unit>();
 
-        //    if (unit.OwnerId == PlayerSessionManager.Instance.LocalPlayerId)
-        //        myUnits.Add(unit);
-        //    else
-        //        enemyUnits.Add(unit);
-        //}
+        foreach (var unit in awayUnits)
+        {
+            if (unit == null)
+            {
+                Debug.Log("유닛이 null입니다.");
+                continue;
+            }
 
-        //myUnits.Sort(new UnitComparer(enemyUnits));
+            battleUnits.Add(unit);
+        }
 
-        //foreach (var unit in myUnits)
-        //    unit.BattleStartAI();
+        for (int i = 0; i < battleUnits.Count; ++i)
+        {
+            Tile fromTile = battleUnits[i].curTile;
+            if (fromTile == null) continue;
+
+            Vector3Int originCoord = fromTile.BoardCoord;
+            Vector3Int targetCoord = GetOppositeCoordinates(originCoord);
+
+            Tile targetTile = homeBoard.GetTileAt(targetCoord);
+            if (targetTile == null)
+            {
+                Debug.Log($"대응되는 타일이 없습니다: {targetTile}");
+                continue;
+            }
+
+            UnitPlacementManager.Instance.RequestMove(battleUnits[i], targetTile);
+        }
     }
 
 
-    //// @@@@ 디버그용 더미 적 생성
-    //[SerializeField] private GameObject enemyPrefab;
-    //[SerializeField] private float unitYoffset = 1f;
-    //public void SpawnDummyEnemy(int count)
-    //{
-    //    var tiles = BoardManager.Instance.GetBoardTiles();
+    /// <summary>
+    /// 현재 좌표 180도 회전시켜서 대응되는 타일의 좌표를 리턴
+    /// </summary>
+    private Vector3Int GetOppositeCoordinates(Vector3Int origin)
+    {
+        int x = origin.x;
+        int y = origin.y;
+        int z = origin.z;
 
-    //    List<Tile> tileList = tiles.Where(t => !t.IsOccupied() && t.BoardCoord.z > 3f).ToList();
-
-    //    for (int i = 0; i < count; ++i)
-    //    { 
-    //        int randIdx = Random.Range(0, tileList.Count);
-    //        Tile tile = tileList[randIdx];
-    //        tileList.RemoveAt(randIdx);
-         
-    //        Vector3 spawnPos = tile.transform.position + Vector3.up * unitYoffset;
-    //        GameObject enemyObj = Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
-
-    //        Unit enemy = enemyObj.GetComponent<Unit>();
-    //        enemy.OwnerId = 1;
-    //        enemy.SetCurUnitTile(tile);
-    //        tile.SetOccupyingUnit(enemy);
-
-    //        BoardManager.Instance.RegisterUnitToBoard(enemy, tile);
-
-    //        enemyObj.name = $"DummyEnemy_{i}";
-    //    }
-    //}
+        return new Vector3Int(-x + 3, -y - 10, -z + 7);
+    }
 }
