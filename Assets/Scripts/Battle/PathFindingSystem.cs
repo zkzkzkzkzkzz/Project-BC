@@ -13,7 +13,7 @@ public static class PathFindingSystem
     };
 
     // 계속 이웃 타일을 탐색하면서 최단 경로가 확정되면 해당 경로를 반환
-    public static List<Tile> FindPath(Tile start, Tile end)
+    public static List<Tile> FindPath(Tile start, Tile end, BoardManager board)
     {
         var openSet = new List<Tile> { start };                 // 아직 탐색하지 않은 후보 타일 목록
         var cameFrom = new Dictionary<Tile, Tile>();            // 경로 역추적용 연결 정보
@@ -30,7 +30,7 @@ public static class PathFindingSystem
 
             openSet.Remove(curTile);
 
-            foreach (var neighbor in GetNeighbors(curTile))
+            foreach (var neighbor in GetNeighbors(curTile, board))
             {
                 if (neighbor.IsOccupied() && neighbor != end) continue;
 
@@ -83,7 +83,7 @@ public static class PathFindingSystem
     }
 
 
-    public static List<Tile> GetNeighbors(Tile tile)
+    public static List<Tile> GetNeighbors(Tile tile, BoardManager board)
     {
         var neighbors = new List<Tile>();
 
@@ -91,7 +91,7 @@ public static class PathFindingSystem
         {
             InfiniteLoopDetector.Run();
             Vector3Int neighborCoord = tile.BoardCoord + CubeDirections[i];
-            Tile neighbor = BoardManager.Instance.GetTileAt(neighborCoord);
+            Tile neighbor = board.GetTileAt(neighborCoord);
 
             if (neighbor != null)
                 neighbors.Add(neighbor);

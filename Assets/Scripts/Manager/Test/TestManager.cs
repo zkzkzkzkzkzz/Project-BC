@@ -20,25 +20,28 @@ public class TestManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 그리드 활성화 / 비활성화
-    /// </summary>
-    private bool bGrid = false;
-    public void ToggleGrid()
+    [SerializeField] private float tileSpacing = 20f; // Zone 간 간격 조정용
+
+    private readonly Vector2Int[] zoneGridPositions = new Vector2Int[]
     {
-        bGrid = !bGrid;
-        BoardManager.Instance.ShowHexGrid(bGrid);
-        BenchManager.Instance.ShowBenchGrid(bGrid);
+        new Vector2Int(0, 2), // 0번
+        new Vector2Int(1, 2), // 1번
+        new Vector2Int(2, 2), // 2번
+        new Vector2Int(2, 1), // 3번
+        new Vector2Int(2, 0), // 4번
+        new Vector2Int(1, 0), // 5번
+        new Vector2Int(0, 0), // 6번
+        new Vector2Int(0, 1)  // 7번
+    };
+
+    public void GameStart()
+    {
+        Debug.Log("[TestManager] GameStart 호출됨.");
+
+        ZoneManager.Instance.ClearZones(); // 혹시 기존 Zone이 있다면 초기화
+        ZoneManager.Instance.InitializeZones(zoneGridPositions, tileSpacing);
     }
 
-    /// <summary>
-    /// 유닛 구매
-    /// 구매된 유닛은 벤치에 배치
-    /// </summary>
-    public void PurchaseUnit()
-    {
-        BenchManager.Instance.PlaceUnitOnBench();
-    }
 
     /// <summary>
     /// 게임 상태 전환
@@ -57,28 +60,16 @@ public class TestManager : MonoBehaviour
     }
 
 
-    [SerializeField] private int enemyCount = 1;
+    [SerializeField] private int playerId = 0;
     /// <summary>
-    /// 디버그용 더미 적 생성
-    /// enemyCount : 생성할 적 수
+    /// 유닛 구매
     /// </summary>
-    public void SpawnDummyEnemies()
+    public void PurchaseUnit()
     {
-        BattleManager.Instance.SpawnDummyEnemy(enemyCount);
-    }
-
-    public void ClearEnemy()
-    {
-        var tiles = BoardManager.Instance.GetBoardTiles();
-
-        foreach (Tile tile in tiles)
+        foreach (var zone in ZoneManager.Instance.GetAllZones())
         {
-            if (tile.IsOccupied() && tile.BoardCoord.z > 3f)
-            {
-                Unit unit = tile.GetOccupyingUnit();
-                Destroy(unit.gameObject);
-                tile.SetOccupyingUnit(null);
-            }
+            if (zone.OwnerId == playerId)
+                zone.Bench.PlaceUnitOnBench(playerId);
         }
     }
 }

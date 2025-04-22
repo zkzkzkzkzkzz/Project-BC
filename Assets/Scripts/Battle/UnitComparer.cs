@@ -16,8 +16,8 @@ public class UnitComparer : IComparer<Unit>
         Unit aTarget = FindClosestEnemy(a);
         Unit bTarget = FindClosestEnemy(b);
 
-        float distA = aTarget != null ? PathFindingSystem.Heuristic(a.curTile, b.curTile) : float.MaxValue;
-        float distB = bTarget != null ? PathFindingSystem.Heuristic(b.curTile, a.curTile) : float.MaxValue;
+        float distA = aTarget != null ? PathFindingSystem.Heuristic(a.curTile, aTarget.curTile) : float.MaxValue;
+        float distB = bTarget != null ? PathFindingSystem.Heuristic(b.curTile, bTarget.curTile) : float.MaxValue;
 
         if (distA != distB)
             return distA.CompareTo(distB);

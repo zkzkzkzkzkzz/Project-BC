@@ -21,8 +21,11 @@ public class PlayerSessionManager : MonoBehaviour
         }
     }
 
-    public void SetLocalPlayerId(int localPlayerId)
+    /// <summary>
+    /// 내 로컬 플레이어 ID 설정
+    /// </summary>
+    public void SetLocalPlayerId(int id)
     {
-        LocalPlayerId = localPlayerId;
+        LocalPlayerId = id;
     }
 }

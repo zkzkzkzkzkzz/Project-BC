@@ -25,6 +25,7 @@ public class Tile : MonoBehaviour
 
     public bool IsAvailable() => !IsOccupied() && !IsReserved();
 
+    public Zone zone { get; set; }
 
     public TileType GetTileType()
     {

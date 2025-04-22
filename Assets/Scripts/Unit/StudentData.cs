@@ -18,7 +18,7 @@ public enum Club
 public class StudentData : ScriptableObject
 {
     [Header("기본 정보")]
-    public string Name;
+    public string studentName;
     public Sprite icon;
     public GameObject prefab;
     public int starGrade;   // 1 ~ 3성

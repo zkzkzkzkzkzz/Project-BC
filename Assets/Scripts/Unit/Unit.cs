@@ -4,14 +4,11 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
-    private int ownerId;            // 유닛 오너 고유 id
-    public int OwnerId => ownerId;  // 외부 읽기 전용 프로퍼티 제공
-
     private Camera mainCam;
     private bool isDragging = false;
     private Plane dragPlane;
     private Vector3 originPos;
-    [SerializeField] private float unitYOffset = 1f;
+    public float unitYOffset = 1f;
 
     [SerializeField] private float offsetY = 0.5f;      // 드래그 시 유닛이 들어올려지는 정도
     [SerializeField] private LayerMask tileLayerMask;   // 타일만 감지하도록 레이어 설정
@@ -21,16 +18,13 @@ public class Unit : MonoBehaviour
 
     public TileType curTileType => curTile?.GetTileType() ?? TileType.Bench;
 
+    public Zone zone { get; set; }  // 유닛이 속해있는 구역
+
     private Coroutine moveRoutine;
 
     private void Awake()
     {
         mainCam = Camera.main;
-    }    
-
-    public void SetOwnerId(int id)
-    {
-        ownerId = id;
     }
 
     private void OnMouseDown()
@@ -66,45 +60,28 @@ public class Unit : MonoBehaviour
     {
         isDragging = false;
         
-        if (hoveredTile != null)
-        {
-            Tile myTile = curTile;
-            Tile targetTile = hoveredTile;
-
-            if (myTile == null || targetTile == null ||
-                myTile.GetTileType() == TileType.Board && GameManager.Instance.IsInBattle()) return;
-
-            if (targetTile.GetTileType() == TileType.Board && GameManager.Instance.IsInBattle())
-            {
-                transform.position = originPos;
-                return;
-            }
-
-            Unit otherUnit = targetTile.GetOccupyingUnit();
-
-            if (otherUnit != null && otherUnit != this)
-            {
-                otherUnit.transform.position = myTile.transform.position + Vector3.up * unitYOffset;
-                transform.position = targetTile.transform.position + Vector3.up * unitYOffset;
-
-                otherUnit.SetCurUnitTile(myTile);
-                SetCurUnitTile(targetTile);
-
-                myTile.SetOccupyingUnit(otherUnit);
-                targetTile.SetOccupyingUnit(this);
-            }
-            else
-            {
-                transform.position = targetTile.transform.position + Vector3.up * unitYOffset;
-                myTile.SetOccupyingUnit(null);
-                targetTile.SetOccupyingUnit(this);
-                SetCurUnitTile(targetTile);
-            }
-        }
-        else
+        if (hoveredTile == null)
         {
             transform.position = originPos;
+            return;
         }
+
+        Tile from = curTile;
+        Tile to = hoveredTile;
+
+        if (GameManager.Instance.IsInBattle() &&
+            (from.GetTileType() == TileType.Board || to.GetTileType() == TileType.Board))
+        {
+            transform.position = originPos;
+            return;
+        }
+
+        Unit other = to.GetOccupyingUnit();
+
+        if (other != null && other != this)
+            UnitPlacementManager.Instance.RequestSwap(this, other);
+        else
+            UnitPlacementManager.Instance.RequestMove(this, to);
     }
 
     public void SetCurUnitTile(Tile tile)
@@ -128,7 +105,9 @@ public class Unit : MonoBehaviour
         Unit closestEnemy = null;
         foreach (var unit in Units)
         {
-            if (unit.ownerId == ownerId || unit.curTile == null) continue;
+            if (unit.zone == null || zone == null) continue;
+
+            if (unit.zone.OwnerId == zone.OwnerId || unit.curTile == null) continue;
 
             float dist = PathFindingSystem.Heuristic(curTile, unit.curTile);
             if (dist < minDist)
@@ -154,17 +133,19 @@ public class Unit : MonoBehaviour
 
     private IEnumerator GreedyMoveRoutine()
     {
+        BoardManager board = ZoneManager.Instance.GetMyZone().Board;
+
         while (GameManager.Instance.IsInBattle())
         {
             moveTargetUnit = FindClosestEnemy();
             if (moveTargetUnit == null || moveTargetUnit.curTile == null)
                 break;
 
-            if (IsAdjacentTo(moveTargetUnit)) break;
+            if (IsAdjacentTo(moveTargetUnit, board)) break;
 
             Tile targetTile = moveTargetUnit.curTile;
 
-            List<Tile> path = PathFindingSystem.FindPath(curTile, targetTile);
+            List<Tile> path = PathFindingSystem.FindPath(curTile, targetTile, board);
             if (path == null || path.Count < 2)
             {
                 yield return new WaitForSeconds(0.5f);
@@ -186,8 +167,6 @@ public class Unit : MonoBehaviour
             nextTile.SetOccupyingUnit(this);
             SetCurUnitTile(nextTile);
 
-            //transform.position = nextTile.transform.position + Vector3.up * unitYOffset;
-
             yield return StartCoroutine(MoveSmooth(nextTile));
         }
 
@@ -195,9 +174,9 @@ public class Unit : MonoBehaviour
         curTile?.ClearReservation();
     }
 
-    private bool IsAdjacentTo(Unit target)
+    private bool IsAdjacentTo(Unit target, BoardManager board)
     {
-        var neighbors = PathFindingSystem.GetNeighbors(curTile);
+        var neighbors = PathFindingSystem.GetNeighbors(curTile, board);
         return neighbors.Contains(target.curTile);
     }
 
