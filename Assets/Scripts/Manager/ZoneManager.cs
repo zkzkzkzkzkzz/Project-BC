@@ -35,6 +35,8 @@ public class ZoneManager : MonoBehaviour
 
         for (int i = 0; i < zoneCount; ++i)
         {
+            GameObject zoneRoot = new GameObject($"Zone_{i}");
+
             Vector3 offset = startPosition + zoneOffset * i;
 
             GameObject boardObj = Instantiate(boardPrefab, offset, Quaternion.identity);
@@ -43,11 +45,11 @@ public class ZoneManager : MonoBehaviour
             BoardManager board = boardObj.GetComponent<BoardManager>();
             BenchManager bench = benchObj.GetComponent<BenchManager>();
 
-            if (board != null) board.GenerateGrid();
-            if (bench != null) bench.GenerateBench();
+            if (board != null) board.GenerateGrid(i);
+            if (bench != null) bench.GenerateBench(i);
 
             Zone zone = new Zone();
-            zone.Initialize(i, board, bench);
+            zone.Initialize(i, zoneRoot.transform);
 
             zones.Add(zone);
         }
@@ -84,9 +86,14 @@ public class ZoneManager : MonoBehaviour
         for (int i = 0; i < zoneCount; ++i)
         {
             GameObject zoneRoot = new GameObject($"Zone_{i}");
-
+            
             Vector2Int gridPos = layout[i];
             Vector3 worldPos = new Vector3(gridPos.x * spacing, 0f, gridPos.y * spacing);
+
+            Zone zone = new Zone();
+            zone.Initialize(i, zoneRoot.transform);
+
+            zones.Add(zone);
 
             GameObject boardObj = Instantiate(boardPrefab, worldPos, Quaternion.identity, zoneRoot.transform);
             GameObject benchObj = Instantiate(benchPrefab, worldPos + new Vector3(0f, 0f, -2f), Quaternion.identity, zoneRoot.transform);
@@ -94,13 +101,10 @@ public class ZoneManager : MonoBehaviour
             BoardManager board = boardObj.GetComponent<BoardManager>();
             BenchManager bench = benchObj.GetComponent<BenchManager>();
 
-            if (board != null) board.GenerateGrid();
-            if (bench != null) bench.GenerateBench();
+            if (board != null) board.GenerateGrid(i);
+            if (bench != null) bench.GenerateBench(i);
 
-            Zone zone = new Zone();
-            zone.Initialize(i, board, bench);
-
-            zones.Add(zone);
+            zone.SetBoardAndBench(board, bench);
         }
     }
 

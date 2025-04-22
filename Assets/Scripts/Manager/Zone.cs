@@ -8,15 +8,15 @@ public class Zone
     public BoardManager Board {  get; private set; }
     public BenchManager Bench {  get; private set; }
     public Transform UnitsRoot { get; private set; }
+    public Transform ZoneRoot { get; private set; }
 
-    public void Initialize(int ownerId, BoardManager board, BenchManager bench)
+    public void Initialize(int ownerId, Transform zoneRoot)
     {
         OwnerId = ownerId;
-        Board = board;
-        Bench = bench;
+        ZoneRoot = zoneRoot;
 
         UnitsRoot = new GameObject("Units").transform;
-        UnitsRoot.SetParent(board.transform.parent);
+        UnitsRoot.SetParent(ZoneRoot);
         UnitsRoot.localPosition = Vector3.zero;
     }
 
@@ -26,5 +26,14 @@ public class Zone
     public bool IsMyZone()
     {
         return OwnerId == PlayerSessionManager.Instance.LocalPlayerId;
+    }
+
+    /// <summary>
+    /// 보드/벤치 매니저 설정 (초기화 용)
+    /// </summary>
+    public void SetBoardAndBench(BoardManager board, BenchManager bench)
+    {
+        Board = board;
+        Bench = bench;
     }
 }
