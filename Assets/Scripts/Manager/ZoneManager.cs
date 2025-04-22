@@ -79,6 +79,10 @@ public class ZoneManager : MonoBehaviour
         return zones;
     }
 
+
+    /// <summary>
+    /// zoneCount만큼 zone 생성 및 spacing으로 구역 간 거리 설정 가능
+    /// </summary>
     public void InitializeZones(Vector2Int[] layout, float spacing)
     {
         zones.Clear();
