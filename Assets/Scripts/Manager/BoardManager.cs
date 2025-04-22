@@ -20,7 +20,7 @@ public class BoardManager : MonoBehaviour
         //GenerateGrid();
     }
 
-    public void GenerateGrid()
+    public void GenerateGrid(int ownerId)
     {
         for (int row = 0; row < rows; row++)
         {
@@ -43,6 +43,11 @@ public class BoardManager : MonoBehaviour
                 if (tile == null)
                     tile = tileObj.AddComponent<Tile>();
 
+                Zone zone = ZoneManager.Instance.GetZoneByOwner(ownerId);
+                if (zone == null)
+                    Debug.Log("해당 id에 맞는 zone이 없습니다.");
+
+                tile.zone = ZoneManager.Instance.GetZoneByOwner(ownerId);
                 tile.SetTileType(TileType.Board);
                 tile.BoardCoord = new Vector3Int(x, y, z);
 

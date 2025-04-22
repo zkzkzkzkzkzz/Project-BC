@@ -19,7 +19,7 @@ public class BenchManager : MonoBehaviour
         //GenerateBench();
     }
 
-    public void GenerateBench()
+    public void GenerateBench(int ownerId)
     {
         for (int i = 0; i < benchSize; ++i)
         {
@@ -33,6 +33,7 @@ public class BenchManager : MonoBehaviour
 
             tile.SetTileType(TileType.Bench);
             tile.BenchIndex = i;
+            tile.zone = ZoneManager.Instance.GetZoneByOwner(ownerId);
 
             //tileObj.SetActive(false);
             benchTiles.Add(tile);
@@ -50,7 +51,6 @@ public class BenchManager : MonoBehaviour
                 GameObject unitObj = Instantiate(unitPrefab, unitPos, Quaternion.identity);
                 Unit unit = unitObj.GetComponent<Unit>();
 
-                unit.OwnerId = ownerId;
                 unit.zone = ZoneManager.Instance.GetZoneByOwner(ownerId);
                 unit.SetCurUnitTile(benchTiles[i]);
                 benchTiles[i].SetOccupyingUnit(unit);
