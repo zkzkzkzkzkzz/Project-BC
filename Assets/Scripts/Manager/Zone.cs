@@ -7,12 +7,17 @@ public class Zone
     public int OwnerId { get; private set; }
     public BoardManager Board {  get; private set; }
     public BenchManager Bench {  get; private set; }
+    public Transform UnitsRoot { get; private set; }
 
     public void Initialize(int ownerId, BoardManager board, BenchManager bench)
     {
         OwnerId = ownerId;
         Board = board;
         Bench = bench;
+
+        UnitsRoot = new GameObject("Units").transform;
+        UnitsRoot.SetParent(board.transform.parent);
+        UnitsRoot.localPosition = Vector3.zero;
     }
 
     /// <summary>
